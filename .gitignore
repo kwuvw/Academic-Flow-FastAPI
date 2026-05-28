@@ -1,0 +1,33 @@
+# Виртуальное окружение (самое главное, чтобы не весило сотни мегабайт в Git)
+.venv/
+venv/
+ENV/
+env/
+
+# Кэш Python (компилированные файлы, которые генерируются на лету)
+**/__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+
+# Конфигурация и приватные данные (пароли к базе данных)
+.env
+*.env
+
+# Логи и базы данных (если вдруг решишь потестить на SQLite)
+*.log
+*.sqlite3
+
+# Настройки IDE (IntelliJ IDEA, VS Code, Cursor)
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# OS файлы (мусор операционной системы)
+Thumbs.db
+Desktop.ini
