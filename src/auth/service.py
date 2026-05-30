@@ -7,7 +7,7 @@ from src.auth.utils import get_password_hash
 
 class UserDAO:
     @classmethod
-    async def find_by_mail(cls, session: AsyncSession, email: str):
+    async def find_by_email(cls, session: AsyncSession, email: str):
         query = select(User).filter(User.email == email)
         result = await session.execute(query)
         return result.scalar_one_or_none()
