@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+
+<body>
+    <main class="page-center">
+        <section class="stack">
+            <h1>
+                Регистрируйся и начинай <span class="marker">учиться</span>
+            </h1>
+            <form id="register-form" class="form-card" style="max-width: 540px" novalidate>
+                <p id="form-message" class="form-message" role="alert"></p>
+                <div class="form-group">
+                    <label for="email">Почта</label>
+                    <input id="email" name="email" class="input-field" type="email" placeholder="mail@example.com"
+                        autocomplete="email" required />
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль</label>
+                    <input id="password" name="password" class="input-field" type="password" placeholder="********"
+                        autocomplete="new-password" minlength="6" maxlength="50" required />
+                </div>
+                <div class="form-group">
+                    <span>Роль</span>
+                    <div class="role-selector" role="radiogroup" aria-label="Выбор роли">
+                        <div class="role-option">
+                            <input type="radio" id="role-student" name="role" value="student" required />
+                            <label for="role-student">Студент</label>
+                        </div>
+                        <div class="role-option">
+                            <input type="radio" id="role-teacher" name="role" value="teacher" required />
+                            <label for="role-teacher">Преподаватель</label>
+                        </div>
+                    </div>
+                    <span id="role-error" class="error-text"></span>
+                </div>
+                <button type="submit" class="btn-primary">Регистрация</button>
+                <p class="auth-footnote">
+                    Уже есть аккаунт? <a href="/login">Войти</a>
+                </p>
+            </form>
+        </section>
+    </main>
+    <script src="/static/js/auth-register.js"></script>
+</body>
+
+</html>

@@ -31,3 +31,6 @@ env/
 # OS файлы (мусор операционной системы)
 Thumbs.db
 Desktop.ini
+
+
+__pycache__/

@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from src.auth.models import User
+from src.auth.models import User, UserRole
 from src.auth.schemas import SUserRegister
 from src.auth.utils import get_password_hash
 
@@ -17,8 +17,9 @@ class UserDAO:
         hashed_pwd = get_password_hash(user_data.password)
         
         new_user = User(
-            email = user_data.email,
-            hashed_password = hashed_pwd
+            email=user_data.email,
+            hashed_password=hashed_pwd,
+            role=UserRole(user_data.role),
         )
         
         session.add(new_user)
