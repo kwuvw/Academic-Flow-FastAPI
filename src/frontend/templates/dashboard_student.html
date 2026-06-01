@@ -4,34 +4,85 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ title }}</title>
-  <link rel="stylesheet" href="/static/style.css" />
+  <title>Edu Platform - Student Dashboard</title>
+  <link rel="stylesheet" href="/src/frontend/static/style.css" />
 </head>
 
 <body>
   <header class="header">
-    <div class="logo">ACADEMIC FLOW</div>
+    <a class="logo" href="/studentFilesFolder/dashboard_student.html">ACADEMIC FLOW</a>
     <nav class="nav">
-      <a href="/dashboard/student" class="active">Кабинет</a>
-      <a href="/">Главная</a>
+      <a class="active" href="#">Главная</a>
+      <a href="#">Преподаватели</a>
+      <a href="#">Твои задания</a>
+      <a href="#">Горишь🔥</a>
     </nav>
     <div class="profile">
-      <span>Студент</span>
-      <span class="avatar">С</span>
+      <span id="user-display-name"></span>
+      <span class="avatar">🔥</span>
     </div>
   </header>
 
-  <main class="dashboard-stub">
-    <h1>Кабинет <span class="marker">студента</span></h1>
-    <p class="text-hint">
-      Здесь появятся ваши задания, дедлайны и материалы курсов.
-    </p>
-    <section class="card">
-      <h2 class="section-title" style="font-size: 1.3rem; margin-bottom: 10px;">Скоро здесь</h2>
-      <p class="text-hint" style="margin: 0;">
-        Раздел в разработке. Вы успешно вошли как студент.
+  <main class="dashboard-layout">
+    <section class="dashboard-main">
+      <h2>Прикрепленные преподаватели:</h2>
+      <p class="subtitle">
+        Преподаватели к которым ты “прикреплен”, для того, что бы смотреть
+        кому сдавать предмет.
       </p>
+      <div class="teacher-list">
+        <article class="teacher-item">
+          <span class="avatar"></span>
+          <span class="teacher-name">Говоров Михаил</span>
+          <button class="btn-secondary small-btn">Удалить</button>
+        </article>
+        <article class="teacher-item">
+          <span class="avatar">🔥</span>
+          <span class="teacher-name">Павлов Роман</span>
+          <button class="btn-secondary small-btn">Удалить</button>
+        </article>
+        <article class="teacher-item">
+          <span class="avatar"></span>
+          <span class="teacher-name">Советникова Алёна</span>
+          <button class="btn-secondary small-btn">Удалить</button>
+        </article>
+        <a href="/studentFilesFolder/teachers.html" class="all-link">Все...</span>
+      </div>
+
+      <h2>Недавние задания:</h2>
+      <p class="subtitle">
+        Задания, которые дали тебе твои преподаватели и сроки выполнения.
+      </p>
+      <div class="task-list">
+        <article class="task-item">
+          <span class="task-icon"></span>
+          <div class="task-content">
+            <p class="task-title">
+              Создать простую базу данных, используя учебные материалы из
+              файла
+            </p>
+            <div class="task-actions">
+              <button class="btn-primary">Скачать файл</button>
+              <button class="btn-secondary white-text">Задание.PDF</button>
+            </div>
+            <p class="task-dates">C 01.04.2026, До 10.04.2026.</p>
+          </div>
+        </article>
+
+        <article class="task-item">
+          <span class="task-icon"></span>
+          <div class="task-content">
+            <p class="task-title">Написать калькулятор на Android Studio</p>
+            <div class="task-actions">
+              <button class="btn-primary">Скачать файл</button>
+              <button class="btn-secondary white-text">CalculatorTZ.PDF</button>
+            </div>
+            <p class="task-dates">C 09.01.2026, До 20.04.2026.</p>
+          </div>
+        </article>
+      </div>
     </section>
+
   </main>
 </body>
 
