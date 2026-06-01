@@ -4,16 +4,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Edu Platform - Teacher Dashboard</title>
-  <link rel="stylesheet" href="/src/frontend/static/style.css" />
+  <title>{{ title }}</title>
+  <link rel="stylesheet" href="/static/style.css" />
 </head>
 
-<body>
+<body class="dashboard-page">
   <header class="header">
-    <a class="logo" href="">ACADEMIC FLOW</a>
+    <a class="logo" href="/dashboard/teacher">ACADEMIC FLOW</a>
     <nav class="nav">
-      <a class="active" href="#">Главная</a>
-      <a href="#">Студенты</a>
+      <a class="active" href="/dashboard/teacher">Главная</a>
+      <a href="/students">Студенты</a>
       <a href="#">Группы</a>
     </nav>
     <div class="profile">
@@ -22,61 +22,100 @@
     </div>
   </header>
 
-  <main class="dashboard-layout">
-    <section class="dashboard-main">
-      <h2>Прикрепленные к вам студенты:</h2>
-      <p class="subtitle">
-        Студенты, которые прикрепились к вам, что бы получать новые задания
-      </p>
-      <div class="teacher-list">
-        <article class="teacher-item">
-          <span class="avatar"></span>
-          <span class="teacher-name">Коновалов Константин</span>
-          <button class="btn-secondary small-btn">Удалить</button>
-        </article>
-        <article class="teacher-item">
-          <span class="avatar"></span>
-          <span class="teacher-name">Ольга Голованова</span>
-          <button class="btn-secondary small-btn">Удалить</button>
-        </article>
-        <article class="teacher-item">
-          <span class="avatar"></span>
-          <span class="teacher-name">Никита Ганиев</span>
-          <button class="btn-secondary small-btn">Удалить</button>
-        </article>
-        <a href="#" class="all-link">Все...</span>
-      </div>
+  <main class="dashboard-layout dashboard-layout--teacher">
+    <div class="dashboard-content">
+      <section class="dashboard-hero">
+        <div class="dashboard-hero__text">
+          <p class="dashboard-eyebrow">Кабинет преподавателя</p>
+          <h1 class="dashboard-title">Управляйте <span class="marker">группами</span> и заданиями</h1>
+          <p class="subtitle dashboard-hero__subtitle">
+            Публикуйте материалы, отслеживайте прикреплённых студентов и дедлайны.
+          </p>
+        </div>
+        <div class="dashboard-stats">
+          <article class="stat-card">
+            <span class="stat-card__value">3</span>
+            <span class="stat-card__label">Студента</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-card__value">3</span>
+            <span class="stat-card__label">Группы</span>
+          </article>
+          <article class="stat-card stat-card--accent">
+            <span class="stat-card__value">+</span>
+            <span class="stat-card__label">Новое задание</span>
+          </article>
+        </div>
+      </section>
 
-      <h2>Выложить задание для группы:</h2>
-      <p class="subtitle">
-        Список групп, для которых можно опубликовать задания в данный момент
-      </p>
+      <section class="dashboard-section">
+        <div class="dashboard-section__header">
+          <h2>Прикрепленные к вам студенты</h2>
+          <p class="subtitle">
+            Студенты, которые прикрепились к вам, чтобы получать новые задания.
+          </p>
+        </div>
+        <div class="teacher-list">
+          <article class="teacher-item">
+            <span class="avatar"></span>
+            <div class="teacher-info">
+              <span class="teacher-name">Коновалов Константин</span>
+              <span class="teacher-email">З-ИС-6</span>
+            </div>
+            <button type="button" class="btn-secondary small-btn">Удалить</button>
+          </article>
+          <article class="teacher-item">
+            <span class="avatar"></span>
+            <div class="teacher-info">
+              <span class="teacher-name">Ольга Голованова</span>
+              <span class="teacher-email">З-Р-23</span>
+            </div>
+            <button type="button" class="btn-secondary small-btn">Удалить</button>
+          </article>
+          <article class="teacher-item">
+            <span class="avatar"></span>
+            <div class="teacher-info">
+              <span class="teacher-name">Никита Ганиев</span>
+              <span class="teacher-email">З-СА-6</span>
+            </div>
+            <button type="button" class="btn-secondary small-btn">Удалить</button>
+          </article>
+          <a href="#" class="all-link">Все студенты →</a>
+        </div>
+      </section>
 
-      <div class="group-task-list grid-container">
-        <article class="group-task-item">
-          <span class="group-id">З-ИС-6</span>
-          <a href="addTask.html" class="btn-link">
-            <button class="btn-primary group-btn">Добавить новое задание</button>
-          </a>
-        </article>
+      <section class="dashboard-section">
+        <div class="dashboard-section__header">
+          <h2>Выложить задание для группы</h2>
+          <p class="subtitle">
+            Список групп, для которых можно опубликовать задания в данный момент.
+          </p>
+        </div>
 
+        <div class="group-task-list grid-container">
+          <article class="group-task-item">
+            <span class="group-id">З-ИС-6</span>
+            <a href="addTask.html" class="btn-link">
+              <button type="button" class="btn-primary group-btn">Добавить новое задание</button>
+            </a>
+          </article>
 
-        <article class="group-task-item">
-          <span class="group-id">З-Р-23</span>
-          <a href="addTask.html" class="btn-link">
-            <button class="btn-primary group-btn">Добавить новое задание</button>
-          </a>
-        </article>
+          <article class="group-task-item">
+            <span class="group-id">З-Р-23</span>
+            <a href="addTask.html" class="btn-link">
+              <button type="button" class="btn-primary group-btn">Добавить новое задание</button>
+            </a>
+          </article>
 
-        <article class="group-task-item">
-          <span class="group-id">З-СА-6</span>
-          <a href="addTask.html" class="btn-link">
-            <button class="btn-primary group-btn">Добавить новое задание</button>
-          </a>
-        </article>
-      </div>
-    </section>
-
+          <article class="group-task-item">
+            <span class="group-id">З-СА-6</span>
+            <a href="addTask.html" class="btn-link">
+              <button type="button" class="btn-primary group-btn">Добавить новое задание</button>
+            </a>
+          </article>
+        </div>
+      </section>
+    </div>
   </main>
 </body>
 

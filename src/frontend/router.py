@@ -49,3 +49,21 @@ async def teacher_dashboard(request: Request):
         name="dashboard_teacher.html",
         context={"title": "Academic Flow | Кабинет преподавателя"},
     )
+
+
+@router.get("/teachers", response_class=HTMLResponse)
+async def teachers_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="teachers.html",
+        context={"title": "Academic Flow | Преподаватели"},
+    )
+
+
+@router.get("/students", response_class=HTMLResponse)
+async def students_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="students.html",
+        context={"title": "Academic Flow | Студенты"},
+    )

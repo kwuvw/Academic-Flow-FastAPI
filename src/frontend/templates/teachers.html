@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ title }}</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+
+<body class="dashboard-page">
+  <header class="header">
+    <a class="logo" href="/dashboard/student">ACADEMIC FLOW</a>
+    <nav class="nav">
+      <a href="/dashboard/student">Главная</a>
+      <a class="active" href="/teachers">Преподаватели</a>
+      <a href="#">Твои задания</a>
+      <a href="#">Горишь🔥</a>
+    </nav>
+    <div class="profile">
+      <span id="user-display-name"></span>
+      <span class="avatar">🔥</span>
+    </div>
+  </header>
+
+  <main class="teachers-page connections-page">
+    <section class="page-section">
+      <div class="page-section__header">
+        <h2>Прикреплённые преподаватели</h2>
+        <p class="subtitle">Преподаватели, которые приняли вашу заявку.</p>
+      </div>
+      <div id="attached-teachers-list" class="teacher-list"></div>
+    </section>
+
+    <hr class="page-separator" />
+
+    <section class="page-section">
+      <div class="page-section__header">
+        <h2 class="muted-title">Возможные преподаватели</h2>
+        <p class="subtitle">
+          Все преподаватели системы. Отправьте заявку, чтобы прикрепиться к курсу.
+        </p>
+      </div>
+      <div id="teachers-container" class="teacher-list"></div>
+    </section>
+  </main>
+
+  <script src="/static/js/auth-api.js"></script>
+  <script src="/static/js/teachers.js"></script>
+</body>
+
+</html>

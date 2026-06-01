@@ -31,3 +31,32 @@ class SUserMeResponse(BaseModel):
     is_verified: bool
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class SConnectionUser(BaseModel):
+    id: int
+    email: EmailStr
+    connection_id: int | None = None
+    status: Literal["pending", "accepted", "rejected"] | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class SMyTeachersResponse(BaseModel):
+    accepted: list[SConnectionUser]
+    pending: list[SConnectionUser]
+    all_teachers: list[SConnectionUser]
+
+
+class SMyStudentsResponse(BaseModel):
+    accepted: list[SConnectionUser]
+    pending: list[SConnectionUser]
+
+
+class SConnectionRequest(BaseModel):
+    teacher_id: int = Field(..., gt=0)
+
+
+class SConnectionRespond(BaseModel):
+    connection_id: int = Field(..., gt=0)
+    status: Literal["accepted", "rejected"]
