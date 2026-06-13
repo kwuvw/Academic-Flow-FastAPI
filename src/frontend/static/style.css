@@ -206,7 +206,41 @@ h1 {
     background: var(--white);
 }
 
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 24px;
+    padding: 20px 22px;
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-sm);
+}
 
+.profile-info__row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.profile-info__row:last-child {
+    border-bottom: none;
+}
+
+.profile-info__label {
+    min-width: 120px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--grey-hint);
+    flex-shrink: 0;
+}
+
+.profile-info__value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--black-fg);
+}
 
 
 
@@ -227,6 +261,77 @@ h1 {
     background: var(--black-fg);
     color: var(--white);
     text-align: left;
+}
+
+.profile-form-card {
+    margin: 30px auto 16px;
+    padding: 40px 36px;
+    border-radius: var(--radius-xl);
+    background: var(--white);
+    color: var(--black-fg);
+    text-align: left;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-subtle);
+    max-width: 100%;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-row .form-group {
+    min-width: 0;
+}
+
+.profile-form-card .input-field {
+    background: var(--surface-muted);
+    border: 1px solid var(--border-subtle);
+    color: var(--black-fg);
+    padding: 14px 14px;
+    border-radius: var(--radius-sm);
+}
+
+.profile-form-card .input-field:focus {
+    outline: 2px solid var(--orange-primary);
+    outline-offset: 1px;
+    border-color: var(--orange-primary);
+}
+
+.profile-form-card .form-group label {
+    color: var(--black-fg);
+}
+
+.profile-form-card .btn-primary {
+    width: 100%;
+    margin-top: 12px;
+    padding: 14px 24px;
+    font-size: 1rem;
+    border-radius: var(--radius-sm);
+}
+
+.profile-form-card .btn-logout {
+    width: 100%;
+    margin-top: 12px;
+    padding: 14px 24px;
+    font-size: 1rem;
+    border-radius: var(--radius-sm);
+    background-color: #ff3b30;
+    color: var(--white);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.profile-form-card .btn-logout:hover {
+    background-color: #e0342a;
+}
+
+.profile-form-card .btn-logout:active {
+    background-color: #c5302c;
+    transform: scale(0.98);
 }
 
 .form-group {
@@ -261,7 +366,37 @@ h1 {
 
 .input-field.error {
     border: 1px solid #ff3b30 !important;
-    outline: none;
+    outline: 2px solid rgba(255, 59, 48, 0.25);
+    outline-offset: 1px;
+}
+
+.field-error {
+    display: none;
+    min-height: 1.2em;
+    margin-top: 4px;
+    color: #ff3b30;
+    font-size: 0.82rem;
+    font-weight: 500;
+    line-height: 1.3;
+}
+
+.field-error.visible {
+    display: block;
+}
+
+.select-field {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238e8e93' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+}
+
+.profile-form-card .select-field {
+    background-color: var(--surface-muted);
+    border: 1px solid var(--border-subtle);
+    color: var(--black-fg);
 }
 
 .error-text {

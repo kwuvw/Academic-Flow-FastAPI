@@ -105,3 +105,28 @@ async def get_my_students(
 ):
     data = await ConnectionDAO.build_my_students(session, teacher.id)
     return SMyStudentsResponse(**data)
+
+
+@router.delete("/detach/{connection_id}", status_code=status.HTTP_200_OK)
+async def detach_student(
+    connection_id: int,
+    teacher: User = Depends(get_current_teacher),
+    session: AsyncSession = Depends(get_async_session),
+):
+    connection = await ConnectionDAO.get_connection_by_id(session, connection_id)
+    if connection is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Связь не найдена",
+        )
+
+    if connection.teacher_id != teacher.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Вы не являетесь преподавателем для этой связи",
+        )
+
+    await session.delete(connection)
+    await session.commit()
+
+    return {"detail": "Студент откреплён"}

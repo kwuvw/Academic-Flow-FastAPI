@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block content %}
+<main class="teachers-page">
+  <section class="page-section">
+    <div class="page-section__header">
+      <h2>Профиль пользователя</h2>
+      <p class="subtitle">Просмотр и редактирование личных данных.</p>
+    </div>
+
+    <div id="form-message" class="form-message" role="alert"></div>
+
+    <div class="profile-info card" id="profile-info">
+      <div class="profile-info__row">
+        <span class="profile-info__label">Почта</span>
+        <span class="profile-info__value" id="info-email">—</span>
+      </div>
+      <div class="profile-info__row">
+        <span class="profile-info__label">Роль</span>
+        <span class="profile-info__value" id="info-role">—</span>
+      </div>
+      <div class="profile-info__row">
+        <span class="profile-info__label">Фамилия</span>
+        <span class="profile-info__value" id="info-last-name">—</span>
+      </div>
+      <div class="profile-info__row">
+        <span class="profile-info__label">Имя</span>
+        <span class="profile-info__value" id="info-first-name">—</span>
+      </div>
+      <div class="profile-info__row">
+        <span class="profile-info__label">Отчество</span>
+        <span class="profile-info__value" id="info-middle-name">—</span>
+      </div>
+      <div class="profile-info__row student-field" style="display:none">
+        <span class="profile-info__label">Группа</span>
+        <span class="profile-info__value" id="info-group-name">—</span>
+      </div>
+      <div class="profile-info__row student-field" style="display:none">
+        <span class="profile-info__label">Курс</span>
+        <span class="profile-info__value" id="info-course-number">—</span>
+      </div>
+      <div class="profile-info__row teacher-field" style="display:none">
+        <span class="profile-info__label">Кафедра</span>
+        <span class="profile-info__value" id="info-department">—</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="page-separator" />
+
+  <section class="page-section">
+    <div class="page-section__header">
+      <h2>Редактирование</h2>
+      <p class="subtitle">Измените данные и нажмите «Сохранить».</p>
+    </div>
+
+    <form id="profile-form" class="profile-form-card" novalidate>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="last-name">Фамилия</label>
+          <input id="last-name" name="last_name" class="input-field" type="text" placeholder="Ваша фамилия" autocomplete="family-name" />
+          <span class="field-error" id="error-last-name"></span>
+        </div>
+        <div class="form-group">
+          <label for="first-name">Имя</label>
+          <input id="first-name" name="first_name" class="input-field" type="text" placeholder="Ваше имя" autocomplete="given-name" />
+          <span class="field-error" id="error-first-name"></span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="middle-name">Отчество</label>
+        <input id="middle-name" name="middle_name" class="input-field" type="text" placeholder="Ваше отчество" autocomplete="additional-name" />
+        <span class="field-error" id="error-middle-name"></span>
+      </div>
+      <div class="form-row student-field" style="display:none">
+        <div class="form-group">
+          <label for="group-name">Группа</label>
+          <select id="group-name" name="group_name" class="input-field select-field">
+            <option value="">Выберите группу</option>
+            <option value="ГД">ГД</option>
+            <option value="Д">Д</option>
+            <option value="ИЗ">ИЗ</option>
+            <option value="ИС">ИС</option>
+            <option value="КМ">КМ</option>
+            <option value="Т">Т</option>
+            <option value="СА">СА</option>
+            <option value="Р">Р</option>
+            <option value="ПП">ПП</option>
+            <option value="ОН">ОН</option>
+            <option value="БУХ">БУХ</option>
+            <option value="МС">МС</option>
+          </select>
+          <span class="field-error" id="error-group-name"></span>
+        </div>
+        <div class="form-group">
+          <label for="course-number">Курс</label>
+          <select id="course-number" name="course_number" class="input-field select-field">
+            <option value="">—</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+          <span class="field-error" id="error-course-number"></span>
+        </div>
+      </div>
+      <div class="form-group teacher-field" style="display:none">
+        <label for="department">Кафедра</label>
+        <input id="department" name="department" class="input-field" type="text" placeholder="Название кафедры" />
+        <span class="field-error" id="error-department"></span>
+      </div>
+
+      <button type="submit" class="btn-primary">Сохранить</button>
+      <button type="button" class="btn-logout" id="logout-btn">Выйти</button>
+    </form>
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/profile.js?v=4"></script>
+{% endblock %}

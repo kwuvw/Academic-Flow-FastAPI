@@ -1,122 +1,107 @@
-<!doctype html>
-<html lang="ru">
+{% extends 'base.html' %}
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ title }}</title>
-  <link rel="stylesheet" href="/static/style.css" />
-</head>
+{% block title %}{{ title }}{% endblock %}
+{% block body_class %}dashboard-page{% endblock %}
 
-<body class="dashboard-page">
-  <header class="header">
-    <a class="logo" href="/dashboard/teacher">ACADEMIC FLOW</a>
-    <nav class="nav">
-      <a class="active" href="/dashboard/teacher">Главная</a>
-      <a href="/students">Студенты</a>
-      <a href="#">Группы</a>
-    </nav>
-    <div class="profile">
-      <span id="user-display-name"></span>
-      <span class="avatar">👤</span>
-    </div>
-  </header>
+{% block content %}
+<main class="dashboard-layout dashboard-layout--teacher">
+  <div class="dashboard-content">
+    <section class="dashboard-hero">
+      <div class="dashboard-hero__text">
+        <p class="dashboard-eyebrow">Кабинет преподавателя</p>
+        <h1 class="dashboard-title">Управляйте <span class="marker">группами</span> и заданиями</h1>
+        <p class="subtitle dashboard-hero__subtitle">
+          Публикуйте материалы, отслеживайте прикреплённых студентов и дедлайны.
+        </p>
+      </div>
+      <div class="dashboard-stats">
+        <article class="stat-card">
+          <span class="stat-card__value">{{ students | length }}</span>
+          <span class="stat-card__label">
+            {% if students | length == 1 %}Студент{% elif students | length in [2, 3, 4] %}Студента{% else %}Студентов{% endif %}
+          </span>
+        </article>
+        <article class="stat-card">
+          <span class="stat-card__value">{{ students | map(attribute='group_name') | unique | list | length }}</span>
+          <span class="stat-card__label">Группы</span>
+        </article>
+        <article class="stat-card stat-card--accent">
+          <span class="stat-card__value">+</span>
+          <span class="stat-card__label">Новое задание</span>
+        </article>
+      </div>
+    </section>
 
-  <main class="dashboard-layout dashboard-layout--teacher">
-    <div class="dashboard-content">
-      <section class="dashboard-hero">
-        <div class="dashboard-hero__text">
-          <p class="dashboard-eyebrow">Кабинет преподавателя</p>
-          <h1 class="dashboard-title">Управляйте <span class="marker">группами</span> и заданиями</h1>
-          <p class="subtitle dashboard-hero__subtitle">
-            Публикуйте материалы, отслеживайте прикреплённых студентов и дедлайны.
-          </p>
-        </div>
-        <div class="dashboard-stats">
-          <article class="stat-card">
-            <span class="stat-card__value">3</span>
-            <span class="stat-card__label">Студента</span>
-          </article>
-          <article class="stat-card">
-            <span class="stat-card__value">3</span>
-            <span class="stat-card__label">Группы</span>
-          </article>
-          <article class="stat-card stat-card--accent">
-            <span class="stat-card__value">+</span>
-            <span class="stat-card__label">Новое задание</span>
-          </article>
-        </div>
-      </section>
+    <section class="dashboard-section">
+      <div class="dashboard-section__header">
+        <h2>Прикрепленные к вам студенты</h2>
+        <p class="subtitle">
+          Студенты, которые прикрепились к вам, чтобы получать новые задания.
+        </p>
+      </div>
+      <div class="teacher-list" id="students-list">
+        {% if students %}
+          {% for student in students %}
+            <article class="teacher-item" data-connection-id="{{ student.connection_id }}">
+              <span class="avatar" aria-hidden="true">{{ student.last_name[0] if student.last_name else '' }}{{ student.first_name[0] if student.first_name else '' }}</span>
+              <div class="teacher-info">
+                <span class="teacher-name">{{ student.last_name }} {{ student.first_name }}</span>
+                <span class="teacher-email">
+                  {% if student.course_number and student.group_name %}
+                    {{ student.course_number }}-{{ student.group_name }}
+                  {% elif student.group_name %}
+                    {{ student.group_name }}
+                  {% else %}
+                    &mdash;
+                  {% endif %}
+                </span>
+              </div>
+              <button
+                type="button"
+                class="btn-secondary small-btn detach-btn"
+                data-connection-id="{{ student.connection_id }}"
+              >Удалить</button>
+            </article>
+          {% endfor %}
+        {% else %}
+          <p class="empty-state">К вам пока не прикрепился ни один студент.</p>
+        {% endif %}
+      </div>
+    </section>
 
-      <section class="dashboard-section">
-        <div class="dashboard-section__header">
-          <h2>Прикрепленные к вам студенты</h2>
-          <p class="subtitle">
-            Студенты, которые прикрепились к вам, чтобы получать новые задания.
-          </p>
-        </div>
-        <div class="teacher-list">
-          <article class="teacher-item">
-            <span class="avatar"></span>
-            <div class="teacher-info">
-              <span class="teacher-name">Коновалов Константин</span>
-              <span class="teacher-email">З-ИС-6</span>
-            </div>
-            <button type="button" class="btn-secondary small-btn">Удалить</button>
-          </article>
-          <article class="teacher-item">
-            <span class="avatar"></span>
-            <div class="teacher-info">
-              <span class="teacher-name">Ольга Голованова</span>
-              <span class="teacher-email">З-Р-23</span>
-            </div>
-            <button type="button" class="btn-secondary small-btn">Удалить</button>
-          </article>
-          <article class="teacher-item">
-            <span class="avatar"></span>
-            <div class="teacher-info">
-              <span class="teacher-name">Никита Ганиев</span>
-              <span class="teacher-email">З-СА-6</span>
-            </div>
-            <button type="button" class="btn-secondary small-btn">Удалить</button>
-          </article>
-          <a href="#" class="all-link">Все студенты →</a>
-        </div>
-      </section>
+    <section class="dashboard-section">
+      <div class="dashboard-section__header">
+        <h2>Выложить задание для группы</h2>
+        <p class="subtitle">
+          Список групп, для которых можно опубликовать задания в данный момент.
+        </p>
+      </div>
 
-      <section class="dashboard-section">
-        <div class="dashboard-section__header">
-          <h2>Выложить задание для группы</h2>
-          <p class="subtitle">
-            Список групп, для которых можно опубликовать задания в данный момент.
-          </p>
-        </div>
+      <div class="group-task-list grid-container" id="groups-list">
+        {% set ns = namespace(seen_groups=[]) %}
+        {% for student in students %}
+          {% if student.group_name and student.group_name not in ns.seen_groups %}
+            {% set ns.seen_groups = ns.seen_groups + [student.group_name] %}
+            <article class="group-task-item">
+              <span class="group-id">
+                {% if student.course_number %}{{ student.course_number }}-{{ student.group_name }}{% else %}{{ student.group_name }}{% endif %}
+              </span>
+              <a href="/tasks/add?group={{ student.group_name }}" class="btn-link">
+                <button type="button" class="btn-primary group-btn">Добавить новое задание</button>
+              </a>
+            </article>
+          {% endif %}
+        {% endfor %}
+        {% if not students %}
+          <p class="empty-state">Нет прикреплённых групп.</p>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+</main>
+{% endblock %}
 
-        <div class="group-task-list grid-container">
-          <article class="group-task-item">
-            <span class="group-id">З-ИС-6</span>
-            <a href="addTask.html" class="btn-link">
-              <button type="button" class="btn-primary group-btn">Добавить новое задание</button>
-            </a>
-          </article>
-
-          <article class="group-task-item">
-            <span class="group-id">З-Р-23</span>
-            <a href="addTask.html" class="btn-link">
-              <button type="button" class="btn-primary group-btn">Добавить новое задание</button>
-            </a>
-          </article>
-
-          <article class="group-task-item">
-            <span class="group-id">З-СА-6</span>
-            <a href="addTask.html" class="btn-link">
-              <button type="button" class="btn-primary group-btn">Добавить новое задание</button>
-            </a>
-          </article>
-        </div>
-      </section>
-    </div>
-  </main>
-</body>
-
-</html>
+{% block scripts %}
+<script src="/static/js/auth-api.js"></script>
+<script src="/static/js/dashboard_teacher.js?v=1"></script>
+{% endblock %}

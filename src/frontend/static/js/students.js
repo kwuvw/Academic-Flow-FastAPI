@@ -7,7 +7,7 @@ function createStudentItem(student, actionsElement) {
   article.innerHTML = `
     <span class="avatar" aria-hidden="true">${student.email.charAt(0).toUpperCase()}</span>
     <div class="teacher-info">
-      <span class="teacher-name">${student.email.split("@")[0]}</span>
+      <span class="teacher-name">${student.first_name || ""}</span>
       <span class="teacher-email">${student.email}</span>
     </div>
   `;
@@ -146,6 +146,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  await loadCurrentUserName();
   await loadStudentsPage();
 });

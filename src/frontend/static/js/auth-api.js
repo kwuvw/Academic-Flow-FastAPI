@@ -46,7 +46,7 @@ async function loadCurrentUserName() {
     }
 
     const user = await response.json();
-    element.textContent = user.email.split("@")[0];
+    element.textContent = user.first_name || "";
   } catch {
     /* redirect handled in authFetch */
   }

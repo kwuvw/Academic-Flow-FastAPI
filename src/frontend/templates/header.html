@@ -1,0 +1,21 @@
+<header class="header">
+  <a class="logo" href="/dashboard">ACADEMIC FLOW</a>
+  <nav class="nav">
+    {% set role = user_role or (user.role if user else None) %}
+    {% if role == 'teacher' %}
+      <a href="/dashboard/teacher" class="{% if active_page == '/dashboard/teacher' %}active{% endif %}">Главная</a>
+      <a href="/students" class="{% if active_page == '/students' %}active{% endif %}">Студенты</a>
+      <a href="#">Группы</a>
+    {% else %}
+      <a href="/dashboard/student" class="{% if active_page == '/dashboard/student' %}active{% endif %}">Главная</a>
+      <a href="/teachers" class="{% if active_page == '/teachers' %}active{% endif %}">Преподаватели</a>
+      <a href="#">Твои задания</a>
+      <a href="#">Горишь🔥</a>
+    {% endif %}
+    <a href="/profile" class="{% if active_page == '/profile' %}active{% endif %}">Профиль</a>
+  </nav>
+  <a href="/profile" class="profile">
+    <span id="user-display-name">{{ user.first_name if user else "" }}</span>
+    <span class="avatar">👤</span>
+  </a>
+</header>

@@ -1,145 +1,114 @@
-<!doctype html>
-<html lang="ru">
+{% extends 'base.html' %}
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ title }}</title>
-  <link rel="stylesheet" href="/static/style.css" />
-</head>
+{% block title %}{{ title }}{% endblock %}
+{% block body_class %}dashboard-page{% endblock %}
 
-<body class="dashboard-page">
-  <header class="header">
-    <a class="logo" href="/dashboard/student">ACADEMIC FLOW</a>
-    <nav class="nav">
-      <a class="active" href="/dashboard/student">Главная</a>
-      <a href="/teachers">Преподаватели</a>
-      <a href="#">Твои задания</a>
-      <a href="#">Горишь🔥</a>
-    </nav>
-    <div class="profile">
-      <span id="user-display-name"></span>
-      <span class="avatar">🔥</span>
-    </div>
-  </header>
-
-  <main class="dashboard-layout">
-    <div class="dashboard-content">
-      <section class="dashboard-hero">
-        <div class="dashboard-hero__text">
-          <p class="dashboard-eyebrow">Кабинет студента</p>
-          <h1 class="dashboard-title">Добро пожаловать в <span class="marker">Academic Flow</span></h1>
-          <p class="subtitle dashboard-hero__subtitle">
-            Следите за заданиями, преподавателями и сроками сдачи в одном месте.
-          </p>
-        </div>
-        <div class="dashboard-stats">
-          <article class="stat-card">
-            <span class="stat-card__value">3</span>
-            <span class="stat-card__label">Преподавателя</span>
-          </article>
-          <article class="stat-card">
-            <span class="stat-card__value">2</span>
-            <span class="stat-card__label">Активных задания</span>
-          </article>
-          <article class="stat-card stat-card--accent">
-            <span class="stat-card__value">10.04</span>
-            <span class="stat-card__label">Ближайший дедлайн</span>
-          </article>
-        </div>
-      </section>
-
-      <section class="dashboard-section">
-        <div class="dashboard-section__header">
-          <h2>Прикрепленные преподаватели</h2>
-          <p class="subtitle">
-            Преподаватели, к которым вы прикреплены, чтобы сдавать предметы.
-          </p>
-        </div>
-        <div class="teacher-list">
-          <article class="teacher-item">
-            <span class="avatar"></span>
-            <div class="teacher-info">
-              <span class="teacher-name">Говоров Михаил</span>
-              <span class="teacher-email">Базы данных</span>
-            </div>
-            <button type="button" class="btn-secondary small-btn">Удалить</button>
-          </article>
-          <article class="teacher-item">
-            <span class="avatar">🔥</span>
-            <div class="teacher-info">
-              <span class="teacher-name">Павлов Роман</span>
-              <span class="teacher-email">Мобильная разработка</span>
-            </div>
-            <button type="button" class="btn-secondary small-btn">Удалить</button>
-          </article>
-          <article class="teacher-item">
-            <span class="avatar"></span>
-            <div class="teacher-info">
-              <span class="teacher-name">Советникова Алёна</span>
-              <span class="teacher-email">Проектирование ПО</span>
-            </div>
-            <button type="button" class="btn-secondary small-btn">Удалить</button>
-          </article>
-          <a href="/teachers" class="all-link">Все преподаватели →</a>
-        </div>
-      </section>
-
-      <section class="dashboard-section">
-        <div class="dashboard-section__header">
-          <h2>Недавние задания</h2>
-          <p class="subtitle">
-            Задания от ваших преподавателей и сроки выполнения.
-          </p>
-        </div>
-        <div class="task-list">
-          <article class="task-item">
-            <span class="task-icon" aria-hidden="true"></span>
-            <div class="task-content">
-              <p class="task-title">
-                Создать простую базу данных, используя учебные материалы из файла
-              </p>
-              <div class="task-actions">
-                <button type="button" class="btn-primary">Скачать файл</button>
-                <button type="button" class="btn-secondary white-text">Задание.PDF</button>
-              </div>
-              <p class="task-dates"><span class="task-dates__label">Срок:</span> с 01.04.2026 до 10.04.2026</p>
-            </div>
-          </article>
-
-          <article class="task-item">
-            <span class="task-icon" aria-hidden="true"></span>
-            <div class="task-content">
-              <p class="task-title">Написать калькулятор на Android Studio</p>
-              <div class="task-actions">
-                <button type="button" class="btn-primary">Скачать файл</button>
-                <button type="button" class="btn-secondary white-text">CalculatorTZ.PDF</button>
-              </div>
-              <p class="task-dates"><span class="task-dates__label">Срок:</span> с 09.01.2026 до 20.04.2026</p>
-            </div>
-          </article>
-        </div>
-      </section>
-    </div>
-
-    <aside class="dashboard-sidebar">
-      <div class="sidebar-card sidebar-card--dark">
-        <h3 class="sidebar-card__title">На этой неделе</h3>
-        <p class="sidebar-card__text">Два задания требуют внимания до конца месяца.</p>
-        <ul class="sidebar-deadlines">
-          <li>
-            <span class="sidebar-deadlines__date">10.04</span>
-            <span class="sidebar-deadlines__name">База данных</span>
-          </li>
-          <li>
-            <span class="sidebar-deadlines__date">20.04</span>
-            <span class="sidebar-deadlines__name">Android Studio</span>
-          </li>
-        </ul>
+{% block content %}
+<main class="dashboard-layout">
+  <div class="dashboard-content">
+    <section class="dashboard-hero">
+      <div class="dashboard-hero__text">
+        <p class="dashboard-eyebrow">Кабинет студента</p>
+        <h1 class="dashboard-title">Добро пожаловать в <span class="marker">Academic Flow</span></h1>
+        <p class="subtitle dashboard-hero__subtitle">
+          Следите за заданиями, преподавателями и сроками сдачи в одном месте.
+        </p>
       </div>
-      <div class="chart-visual" aria-hidden="true"></div>
-    </aside>
-  </main>
-</body>
+      <div class="dashboard-stats">
+        <article class="stat-card">
+          <span class="stat-card__value">{{ teachers|length }}</span>
+          <span class="stat-card__label">Преподавателя</span>
+        </article>
+        <article class="stat-card">
+          <span class="stat-card__value">2</span>
+          <span class="stat-card__label">Активных задания</span>
+        </article>
+        <article class="stat-card stat-card--accent">
+          <span class="stat-card__value">10.04</span>
+          <span class="stat-card__label">Ближайший дедлайн</span>
+        </article>
+      </div>
+    </section>
 
-</html>
+    <section class="dashboard-section">
+      <div class="dashboard-section__header">
+        <h2>Прикрепленные преподаватели</h2>
+        <p class="subtitle">
+          Преподаватели, к которым вы прикреплены, чтобы сдавать предметы.
+        </p>
+      </div>
+      <div class="teacher-list">
+        {% if teachers %}
+          {% for teacher in teachers %}
+            <article class="teacher-item">
+              <span class="avatar"></span>
+              <div class="teacher-info">
+                <span class="teacher-name">{{ teacher.first_name }}</span>
+                <span class="teacher-email">{{ teacher.email }}</span>
+              </div>
+              <button type="button" class="btn-secondary small-btn">Удалить</button>
+            </article>
+          {% endfor %}
+        {% else %}
+          <p class="subtitle">У вас пока нет прикреплённых преподавателей.</p>
+        {% endif %}
+        <a href="/teachers" class="all-link">Все преподаватели →</a>
+      </div>
+    </section>
+
+    <section class="dashboard-section">
+      <div class="dashboard-section__header">
+        <h2>Недавние задания</h2>
+        <p class="subtitle">
+          Задания от ваших преподавателей и сроки выполнения.
+        </p>
+      </div>
+      <div class="task-list">
+        <article class="task-item">
+          <span class="task-icon" aria-hidden="true"></span>
+          <div class="task-content">
+            <p class="task-title">
+              Создать простую базу данных, используя учебные материалы из файла
+            </p>
+            <div class="task-actions">
+              <button type="button" class="btn-primary">Скачать файл</button>
+              <button type="button" class="btn-secondary white-text">Задание.PDF</button>
+            </div>
+            <p class="task-dates"><span class="task-dates__label">Срок:</span> с 01.04.2026 до 10.04.2026</p>
+          </div>
+        </article>
+
+        <article class="task-item">
+          <span class="task-icon" aria-hidden="true"></span>
+          <div class="task-content">
+            <p class="task-title">Написать калькулятор на Android Studio</p>
+            <div class="task-actions">
+              <button type="button" class="btn-primary">Скачать файл</button>
+              <button type="button" class="btn-secondary white-text">CalculatorTZ.PDF</button>
+            </div>
+            <p class="task-dates"><span class="task-dates__label">Срок:</span> с 09.01.2026 до 20.04.2026</p>
+          </div>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-card sidebar-card--dark">
+      <h3 class="sidebar-card__title">На этой неделе</h3>
+      <p class="sidebar-card__text">Два задания требуют внимания до конца месяца.</p>
+      <ul class="sidebar-deadlines">
+        <li>
+          <span class="sidebar-deadlines__date">10.04</span>
+          <span class="sidebar-deadlines__name">База данных</span>
+        </li>
+        <li>
+          <span class="sidebar-deadlines__date">20.04</span>
+          <span class="sidebar-deadlines__name">Android Studio</span>
+        </li>
+      </ul>
+    </div>
+    <div class="chart-visual" aria-hidden="true"></div>
+  </aside>
+</main>
+{% endblock %}

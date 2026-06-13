@@ -91,6 +91,8 @@ class ConnectionDAO:
         return SConnectionUser(
             id=user.id,
             email=user.email,
+            first_name=user.first_name,
+            last_name=user.last_name,
             connection_id=connection.id if connection else None,
             status=connection.status.value if connection else None,
         )
@@ -117,9 +119,19 @@ class ConnectionDAO:
             elif connection.status == ConnectionStatus.pending:
                 pending.append(item)
 
+        orphan_teacher_ids = [
+            c.teacher_id for c in connections if c.teacher_id not in teacher_ids
+        ]
+        if orphan_teacher_ids:
+            query = select(User).where(User.id.in_(orphan_teacher_ids))
+            result = await session.execute(query)
+            orphan_teachers = {t.id: t for t in result.scalars().all()}
+        else:
+            orphan_teachers = {}
+
         for connection in connections:
             if connection.teacher_id not in teacher_ids:
-                teacher = await session.get(User, connection.teacher_id)
+                teacher = orphan_teachers.get(connection.teacher_id)
                 if teacher is None:
                     continue
                 item = cls.to_connection_user(teacher, connection)
@@ -145,8 +157,16 @@ class ConnectionDAO:
         accepted: list[SConnectionUser] = []
         pending: list[SConnectionUser] = []
 
+        student_ids = [c.student_id for c in connections]
+        if student_ids:
+            query = select(User).where(User.id.in_(student_ids))
+            result = await session.execute(query)
+            students = {s.id: s for s in result.scalars().all()}
+        else:
+            students = {}
+
         for connection in connections:
-            student = await session.get(User, connection.student_id)
+            student = students.get(connection.student_id)
             if student is None:
                 continue
             item = cls.to_connection_user(student, connection)

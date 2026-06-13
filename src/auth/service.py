@@ -20,9 +20,23 @@ class UserDAO:
             email=user_data.email,
             hashed_password=hashed_pwd,
             role=UserRole(user_data.role),
+            first_name=user_data.first_name,
+            last_name=user_data.last_name,
+            middle_name=user_data.middle_name,
+            group_name=user_data.group_name,
+            course_number=user_data.course_number,
+            department=user_data.department,
         )
         
         session.add(new_user)
         await session.commit()
         await session.refresh(new_user)
         return new_user
+
+    @classmethod
+    async def update_user(cls, session: AsyncSession, user: User, update_data: dict) -> User:
+        for field, value in update_data.items():
+            setattr(user, field, value)
+        await session.commit()
+        await session.refresh(user)
+        return user

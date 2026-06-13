@@ -1,49 +1,30 @@
-<!doctype html>
-<html lang="ru">
+{% extends 'base.html' %}
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ title }}</title>
-  <link rel="stylesheet" href="/static/style.css" />
-</head>
+{% block title %}{{ title }}{% endblock %}
+{% block body_class %}dashboard-page{% endblock %}
 
-<body class="dashboard-page">
-  <header class="header">
-    <a class="logo" href="/dashboard/teacher">ACADEMIC FLOW</a>
-    <nav class="nav">
-      <a href="/dashboard/teacher">Главная</a>
-      <a class="active" href="/students">Студенты</a>
-      <a href="#">Группы</a>
-    </nav>
-    <div class="profile">
-      <span id="user-display-name"></span>
-      <span class="avatar">👤</span>
+{% block content %}
+<main class="teachers-page connections-page">
+  <section class="page-section">
+    <div class="page-section__header">
+      <h2 class="muted-title">Заявки на прикрепление</h2>
+      <p class="subtitle">Входящие заявки от студентов. Примите или отклоните их.</p>
     </div>
-  </header>
+    <div id="requests-container" class="teacher-list"></div>
+  </section>
 
-  <main class="teachers-page connections-page">
-    <section class="page-section">
-      <div class="page-section__header">
-        <h2 class="muted-title">Заявки на прикрепление</h2>
-        <p class="subtitle">Входящие заявки от студентов. Примите или отклоните их.</p>
-      </div>
-      <div id="requests-container" class="teacher-list"></div>
-    </section>
+  <hr class="page-separator" />
 
-    <hr class="page-separator" />
+  <section class="page-section">
+    <div class="page-section__header">
+      <h2>Мои студенты</h2>
+      <p class="subtitle">Студенты, которые прикреплены к вам и могут получать задания.</p>
+    </div>
+    <div id="attached-students-list" class="teacher-list"></div>
+  </section>
+</main>
+{% endblock %}
 
-    <section class="page-section">
-      <div class="page-section__header">
-        <h2>Мои студенты</h2>
-        <p class="subtitle">Студенты, которые прикреплены к вам и могут получать задания.</p>
-      </div>
-      <div id="attached-students-list" class="teacher-list"></div>
-    </section>
-  </main>
-
-  <script src="/static/js/auth-api.js"></script>
-  <script src="/static/js/students.js"></script>
-</body>
-
-</html>
+{% block scripts %}
+<script src="/static/js/students.js?v=2"></script>
+{% endblock %}

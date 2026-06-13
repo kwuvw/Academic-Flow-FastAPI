@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Academic Flow{% endblock %}</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <link rel="stylesheet" href="/static/style.css?v=2" />
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  {% include 'header.html' %}
+
+  <script src="/static/js/auth-api.js?v=2"></script>
+
+  {% block content %}{% endblock %}
+
+  {% block scripts %}{% endblock %}
+
+  <script>
+  document.addEventListener("DOMContentLoaded", async function () {
+    var el = document.getElementById("user-display-name");
+    if (!el) return;
+    if (el.textContent.trim()) return;
+    try {
+      var resp = await authFetch("/auth/me");
+      if (!resp.ok) return;
+      var data = await resp.json();
+      if (data && data.first_name) {
+        el.textContent = data.first_name;
+      }
+    } catch (e) {}
+  });
+  </script>
+</body>
+</html>

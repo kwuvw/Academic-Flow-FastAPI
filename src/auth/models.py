@@ -37,6 +37,13 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
+    first_name: Mapped[str | None] = mapped_column(String(length=100), nullable=True)
+    last_name: Mapped[str | None] = mapped_column(String(length=100), nullable=True)
+    middle_name: Mapped[str | None] = mapped_column("patronymic", String(length=100), nullable=True)
+    group_name: Mapped[str | None] = mapped_column(String(length=50), nullable=True)
+    course_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    department: Mapped[str | None] = mapped_column(String(length=200), nullable=True)
+
 
 class UserConnection(Base):
     __tablename__ = "user_connections"
