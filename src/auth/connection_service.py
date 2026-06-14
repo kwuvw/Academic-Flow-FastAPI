@@ -93,6 +93,10 @@ class ConnectionDAO:
             email=user.email,
             first_name=user.first_name,
             last_name=user.last_name,
+            middle_name=user.middle_name,
+            group_name=user.group_name,
+            course_number=user.course_number,
+            department=user.department,
             connection_id=connection.id if connection else None,
             status=connection.status.value if connection else None,
         )

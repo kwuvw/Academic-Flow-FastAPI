@@ -3,11 +3,15 @@ function createTeacherItem(teacher, actionElement) {
   article.className = "teacher-item";
   article.dataset.teacherId = String(teacher.id);
 
+  const fullName = [teacher.last_name, teacher.first_name, teacher.middle_name].filter(Boolean).join(" ");
+  const subtitle = teacher.department || teacher.email;
+  const initials = ((teacher.last_name || "") + (teacher.first_name || "")).substring(0, 2).toUpperCase();
+
   article.innerHTML = `
-    <span class="avatar" aria-hidden="true">${teacher.email.charAt(0).toUpperCase()}</span>
+    <span class="avatar" aria-hidden="true">${initials || teacher.email.charAt(0).toUpperCase()}</span>
     <div class="teacher-info">
-      <span class="teacher-name">${teacher.first_name || ""}</span>
-      <span class="teacher-email">${teacher.email}</span>
+      <span class="teacher-name">${fullName || teacher.email}</span>
+      <span class="teacher-email">${subtitle}</span>
     </div>
   `;
 

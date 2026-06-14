@@ -36,6 +36,8 @@ class User(Base):
     )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    is_admin: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    is_approved: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     first_name: Mapped[str | None] = mapped_column(String(length=100), nullable=True)
     last_name: Mapped[str | None] = mapped_column(String(length=100), nullable=True)
@@ -43,6 +45,17 @@ class User(Base):
     group_name: Mapped[str | None] = mapped_column(String(length=50), nullable=True)
     course_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
     department: Mapped[str | None] = mapped_column(String(length=200), nullable=True)
+
+    @property
+    def full_name(self):
+        parts = [self.last_name, self.first_name, self.middle_name]
+        return " ".join(p for p in parts if p).strip()
+
+    @property
+    def short_name(self):
+        if self.last_name and self.first_name:
+            return f"{self.last_name} {self.first_name[0]}."
+        return self.first_name or self.email
 
 
 class UserConnection(Base):

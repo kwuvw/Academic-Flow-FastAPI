@@ -41,12 +41,15 @@
         {% if teachers %}
           {% for teacher in teachers %}
             <article class="teacher-item">
-              <span class="avatar"></span>
+              <span class="avatar" aria-hidden="true">{{ teacher.last_name[0] if teacher.last_name else '' }}{{ teacher.first_name[0] if teacher.first_name else '' }}</span>
               <div class="teacher-info">
-                <span class="teacher-name">{{ teacher.first_name }}</span>
-                <span class="teacher-email">{{ teacher.email }}</span>
+                <span class="teacher-name">{{ teacher.last_name }} {{ teacher.first_name }} {{ teacher.middle_name or '' }}</span>
+                {% if teacher.department %}
+                  <span class="teacher-email">{{ teacher.department }}</span>
+                {% else %}
+                  <span class="teacher-email">{{ teacher.email }}</span>
+                {% endif %}
               </div>
-              <button type="button" class="btn-secondary small-btn">Удалить</button>
             </article>
           {% endfor %}
         {% else %}

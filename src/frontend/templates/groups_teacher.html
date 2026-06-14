@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block content %}
+<main class="teachers-page connections-page">
+  <section class="page-section">
+    <div class="page-section__header">
+      <h2 class="muted-title">Группы и студенты</h2>
+      <p class="subtitle">Все группы, в которых есть прикреплённые студенты.</p>
+    </div>
+
+    <div class="teacher-list">
+      {% if groups %}
+        {% for group in groups %}
+          <article class="teacher-item" style="flex-direction: column; align-items: stretch; gap: 14px;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <div class="avatar" style="width: 48px; height: 48px; border-radius: 50%; background-color: #e5e5ea; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <span style="font-size: 20px; font-weight: 700; color: #1d1d1f;">{{ group.initial }}</span>
+              </div>
+
+              <div style="flex: 1; min-width: 0;">
+                <span class="teacher-name" style="font-size: 17px; font-weight: 700;">{{ group.group_name }} ({{ group.course_number }} курс)</span>
+                <br />
+                <span style="color: #86868b; font-size: 14px;">Студентов в группе: {{ group.count }}</span>
+              </div>
+
+              <button
+                type="button"
+                onclick="openTaskModal('{{ group.group_name }}', '{{ group.course_number }}')"
+                style="background-color: #ff9f0a; color: white; border: none; padding: 8px 16px; border-radius: 12px; font-weight: bold; text-decoration: none; display: inline-block; white-space: nowrap; flex-shrink: 0; cursor: pointer;">
+                Выдать задание
+              </button>
+            </div>
+
+            <div style="padding-left: 64px; color: #86868b; font-size: 13px; line-height: 1.5;">
+              {{ group.student_names | join(', ') }}
+            </div>
+          </article>
+        {% endfor %}
+      {% else %}
+        <p class="subtitle">Нет студентов в системе.</p>
+      {% endif %}
+    </div>
+  </section>
+</main>
+
+<div class="task-modal-overlay" id="task-modal">
+  <div class="task-modal" role="dialog" aria-modal="true">
+    <div class="task-modal__header">
+      <h3 class="task-modal__title" id="task-modal-title">Добавить задание</h3>
+      <button type="button" class="task-modal__close" id="task-modal-close" aria-label="Закрыть">&times;</button>
+    </div>
+    <div class="task-modal__body">
+      <form id="task-form" novalidate>
+        <div class="task-modal__field">
+          <label class="task-modal__label" for="task-title">Название задания</label>
+          <input class="task-modal__input" type="text" id="task-title" name="title" placeholder="Например: Лабораторная работа №5" />
+          <span class="task-modal__field-error" id="error-title"></span>
+        </div>
+
+        <div class="task-modal__field">
+          <label class="task-modal__label" for="task-description">Описание задания</label>
+          <textarea class="task-modal__textarea" id="task-description" name="description" placeholder="Подробное описание задания..."></textarea>
+          <span class="task-modal__field-error" id="error-description"></span>
+        </div>
+
+        <div class="task-modal__field">
+          <label class="task-modal__label" for="task-deadline">Срок сдачи</label>
+          <input class="task-modal__input" type="datetime-local" id="task-deadline" name="deadline" />
+          <span class="task-modal__field-error" id="error-deadline"></span>
+        </div>
+
+        <div class="task-modal__field">
+          <label class="task-modal__label">Файлы</label>
+          <div class="task-modal__dropzone" id="task-dropzone">
+            <span class="task-modal__dropzone-icon">&#128206;</span>
+            <span class="task-modal__dropzone-text">Перетащите файлы сюда или <strong>выберите на компьютере</strong></span>
+            <input type="file" id="task-files" name="files" multiple accept=".png,.jpg,.jpeg,.gif,.pdf,.doc,.docx" />
+          </div>
+          <div class="task-modal__file-list" id="task-file-list"></div>
+        </div>
+
+        <input type="hidden" id="task-group-name" name="group_name" />
+        <input type="hidden" id="task-course-number" name="course_number" />
+      </form>
+    </div>
+    <div class="task-modal__footer">
+      <button type="button" class="task-modal__btn-cancel" id="task-modal-cancel">Отмена</button>
+      <button type="button" class="task-modal__btn-submit" id="task-modal-submit">Опубликовать</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast toast--success" id="toast">Задание успешно опубликовано</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/auth/auth-api.js') }}"></script>
+<script src="{{ url_for('static', path='js/dashboard_teacher.js') }}?v=1"></script>
+{% endblock %}

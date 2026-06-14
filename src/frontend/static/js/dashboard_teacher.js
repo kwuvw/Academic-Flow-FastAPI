@@ -99,18 +99,76 @@ function showToast(message) {
   }, 3000);
 }
 
+async function loadGroupsIntoSelect() {
+  var select = document.getElementById('task-group-select');
+  var noGroupsMsg = document.getElementById('no-groups-msg');
+  if (!select) return;
+
+  select.innerHTML = '<option value="">Загрузка...</option>';
+
+  try {
+    var resp = await authFetch('/api/tasks/my-groups');
+    if (!resp.ok) {
+      select.innerHTML = '<option value="">Ошибка загрузки</option>';
+      return;
+    }
+    var groups = await resp.json();
+
+    select.innerHTML = '<option value="">Выберите группу...</option>';
+
+    if (!groups.length) {
+      select.style.display = 'none';
+      if (noGroupsMsg) noGroupsMsg.style.display = 'block';
+      return;
+    }
+
+    select.style.display = '';
+    if (noGroupsMsg) noGroupsMsg.style.display = 'none';
+
+    groups.forEach(function (g) {
+      var opt = document.createElement('option');
+      opt.value = g.group_name;
+      opt.dataset.course = g.course_number || '';
+      opt.textContent = g.label;
+      select.appendChild(opt);
+    });
+  } catch (e) {
+    select.innerHTML = '<option value="">Ошибка сети</option>';
+  }
+}
+
 function openTaskModal(groupName, courseNumber) {
   var modal = document.getElementById('task-modal');
   var title = document.getElementById('task-modal-title');
   var groupInput = document.getElementById('task-group-name');
   var courseInput = document.getElementById('task-course-number');
+  var groupSelect = document.getElementById('task-group-select');
 
   if (!modal || !title || !groupInput || !courseInput) return;
 
-  var label = courseNumber ? courseNumber + '-' + groupName : groupName;
-  title.textContent = 'Добавить задание для группы ' + label;
-  groupInput.value = groupName;
-  courseInput.value = courseNumber || '';
+  loadGroupsIntoSelect();
+
+  if (groupName) {
+    var label = courseNumber ? courseNumber + '-' + groupName : groupName;
+    title.textContent = 'Добавить задание для группы ' + label;
+    groupInput.value = groupName;
+    courseInput.value = courseNumber || '';
+
+    setTimeout(function () {
+      if (groupSelect) {
+        for (var i = 0; i < groupSelect.options.length; i++) {
+          if (groupSelect.options[i].value === groupName) {
+            groupSelect.selectedIndex = i;
+            break;
+          }
+        }
+      }
+    }, 200);
+  } else {
+    title.textContent = 'Добавить новое задание';
+    groupInput.value = '';
+    courseInput.value = '';
+  }
 
   modal.classList.add('is-open');
   document.body.style.overflow = 'hidden';
@@ -138,6 +196,11 @@ function resetTaskForm() {
   selectedFiles = [];
   renderFileList();
 
+  var groupInput = document.getElementById('task-group-name');
+  var courseInput = document.getElementById('task-course-number');
+  if (groupInput) groupInput.value = '';
+  if (courseInput) courseInput.value = '';
+
   document.querySelectorAll('.task-modal__input.error, .task-modal__textarea.error').forEach(function (el) {
     el.classList.remove('error');
   });
@@ -149,6 +212,32 @@ function resetTaskForm() {
 
 function validateTaskForm() {
   var valid = true;
+
+  var groupSelect = document.getElementById('task-group-select');
+  var groupInput = document.getElementById('task-group-name');
+  var groupError = document.getElementById('error-group_select');
+
+  if (groupSelect && groupSelect.style.display !== 'none') {
+    if (!groupSelect.value) {
+      groupSelect.classList.add('error');
+      groupError.textContent = 'Выберите группу';
+      groupError.classList.add('visible');
+      valid = false;
+    } else {
+      groupSelect.classList.remove('error');
+      groupError.classList.remove('visible');
+      groupError.textContent = '';
+
+      var selectedOpt = groupSelect.options[groupSelect.selectedIndex];
+      groupInput.value = groupSelect.value;
+      var courseInput = document.getElementById('task-course-number');
+      if (courseInput && selectedOpt) {
+        courseInput.value = selectedOpt.dataset.course || '';
+      }
+    }
+  } else if (!groupInput.value) {
+    valid = false;
+  }
 
   var titleInput = document.getElementById('task-title');
   var titleError = document.getElementById('error-title');
@@ -291,6 +380,29 @@ document.addEventListener('DOMContentLoaded', function () {
       var group = btn.dataset.group;
       var course = btn.dataset.course;
       if (group) openTaskModal(group, course);
+    });
+  }
+
+  var newTaskStat = document.getElementById('new-task-stat');
+  if (newTaskStat) {
+    newTaskStat.addEventListener('click', function () {
+      openTaskModal(null, null);
+    });
+  }
+
+  var groupSelect = document.getElementById('task-group-select');
+  if (groupSelect) {
+    groupSelect.addEventListener('change', function () {
+      var groupInput = document.getElementById('task-group-name');
+      var courseInput = document.getElementById('task-course-number');
+      var selectedOpt = this.options[this.selectedIndex];
+      if (this.value) {
+        groupInput.value = this.value;
+        courseInput.value = selectedOpt ? (selectedOpt.dataset.course || '') : '';
+      } else {
+        groupInput.value = '';
+        courseInput.value = '';
+      }
     });
   }
 

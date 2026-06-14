@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
+from src.admin.router import router as admin_router
 from src.auth.connections_router import router as connections_router
 from src.auth.router import router as auth_router
 from src.config import settings
@@ -18,3 +19,4 @@ app.include_router(frontend_router)
 app.include_router(auth_router)
 app.include_router(connections_router)
 app.include_router(tasks_router)
+app.include_router(admin_router)

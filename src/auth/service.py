@@ -15,7 +15,9 @@ class UserDAO:
     @classmethod
     async def add_user(cls, session: AsyncSession, user_data: SUserRegister):
         hashed_pwd = get_password_hash(user_data.password)
-        
+
+        is_approved = user_data.role != "teacher"
+
         new_user = User(
             email=user_data.email,
             hashed_password=hashed_pwd,
@@ -26,6 +28,7 @@ class UserDAO:
             group_name=user_data.group_name,
             course_number=user_data.course_number,
             department=user_data.department,
+            is_approved=is_approved,
         )
         
         session.add(new_user)

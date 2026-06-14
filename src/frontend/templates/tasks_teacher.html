@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block content %}
+<main class="teachers-page connections-page">
+  <section class="page-section">
+    <div class="page-section__header">
+      <h2>Выданные задания</h2>
+      <p class="subtitle">Все задания, которые вы выдали студентам.</p>
+    </div>
+
+    <div class="teacher-list">
+      {% if tasks %}
+        {% for task in tasks %}
+          <article class="teacher-item" style="flex-direction: column; align-items: flex-start; gap: 12px; border-radius: 20px; padding: 20px 22px;">
+            <div style="width: 100%; display: flex; flex-direction: column; gap: 4px;">
+              <span style="color: #86868b; font-size: 14px; font-weight: 500;">
+                Группа: {{ task.group_name }}{% if task.course_number %}, {{ task.course_number }} курс{% endif %}
+              </span>
+              <span class="teacher-name" style="font-size: 18px; font-weight: 700;">
+                {{ task.title }}
+              </span>
+            </div>
+
+            {% if task.description %}
+              <p style="margin: 0; color: #1d1d1f; font-size: 15px; line-height: 1.5;">{{ task.description }}</p>
+            {% endif %}
+
+            {% if task.deadline %}
+              <p style="margin: 0; color: #86868b; font-size: 14px;">
+                Срок сдачи: {{ task.deadline.strftime('%d.%m.%Y %H:%M') }}
+              </p>
+            {% endif %}
+
+            {% if task.file_path %}
+              <div style="display: flex; gap: 10px; margin-top: 4px; align-items: center;">
+                <a href="{{ task.file_path }}"
+                   download="{{ task.file_original_name if task.file_original_name else 'Файл' }}"
+                   style="background-color: #ff9f0a; color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: bold; text-decoration: none; display: inline-block; font-size: 14px;">
+                  Скачать файл
+                </a>
+                <span style="color: #86868b; font-size: 13px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  {{ task.file_original_name if task.file_original_name else '' }}
+                </span>
+              </div>
+            {% endif %}
+
+            <div style="display: flex; gap: 10px; margin-top: 8px; width: 100%;">
+              <button onclick="openCompleteModal({{ task.id }}, '{{ task.deadline.isoformat() if task.deadline else '' }}')"
+                      style="background-color: #1d1d1f; color: #ffffff; border: none; padding: 10px 24px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; transition: background-color 0.2s ease;">
+                Завершить
+              </button>
+              <button onclick="openDeleteModal({{ task.id }}, '{{ task.title | e }}')"
+                      style="background-color: transparent; color: #ff3b30; border: none; padding: 10px 24px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; transition: background-color 0.2s ease;"
+                      onmouseover="this.style.backgroundColor='rgba(255,59,48,0.08)'"
+                      onmouseout="this.style.backgroundColor='transparent'">
+                Удалить
+              </button>
+            </div>
+          </article>
+        {% endfor %}
+      {% else %}
+        <p class="subtitle">Вы пока не выдали ни одного задания.</p>
+      {% endif %}
+    </div>
+  </section>
+</main>
+
+<div id="deleteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+  <div style="background: #ffffff; border-radius: 20px; padding: 28px 28px 20px; width: min(100%, 400px); box-shadow: 0 24px 80px rgba(0,0,0,0.18); font-family: inherit;">
+    <h3 style="margin: 0 0 12px; font-size: 18px; font-weight: 700; color: #1d1d1f;">Удалить задание?</h3>
+    <p style="margin: 0 0 24px; font-size: 15px; color: #86868b; line-height: 1.5;">Вы уверены, что хотите удалить это задание? Это действие необратимо.</p>
+    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+      <button onclick="closeDeleteModal()"
+              style="background-color: #f0efee; color: #1d1d1f; border: none; padding: 10px 22px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer;">
+        Отмена
+      </button>
+      <button id="deleteConfirmBtn"
+              style="background-color: #ff3b30; color: #ffffff; border: none; padding: 10px 22px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer;">
+        Удалить
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="completeModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+  <div style="background: #ffffff; border-radius: 20px; padding: 28px 28px 20px; width: min(100%, 400px); box-shadow: 0 24px 80px rgba(0,0,0,0.18); font-family: inherit;">
+    <h3 style="margin: 0 0 12px; font-size: 18px; font-weight: 700; color: #1d1d1f;">Завершить задание?</h3>
+    <p id="completeModalText" style="margin: 0 0 24px; font-size: 15px; color: #86868b; line-height: 1.5;"></p>
+    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+      <button onclick="closeCompleteModal()"
+              style="background-color: #f0efee; color: #1d1d1f; border: none; padding: 10px 22px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer;">
+        Отмена
+      </button>
+      <button id="completeConfirmBtn"
+              style="background-color: #1d1d1f; color: #ffffff; border: none; padding: 10px 22px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer;">
+        Завершить
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" style="display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1d1d1f; color: #fff; padding: 14px 28px; border-radius: 14px; font-size: 15px; font-weight: 600; box-shadow: 0 8px 32px rgba(0,0,0,0.18); z-index: 2000; opacity: 0; transition: opacity 0.3s ease;">
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  let deleteTargetId = null;
+  let completeTargetId = null;
+
+  function openDeleteModal(taskId, taskTitle) {
+    deleteTargetId = taskId;
+    document.getElementById('deleteModal').style.display = 'flex';
+  }
+
+  function closeDeleteModal() {
+    deleteTargetId = null;
+    document.getElementById('deleteModal').style.display = 'none';
+  }
+
+  function openCompleteModal(taskId, deadlineStr) {
+    completeTargetId = taskId;
+    var textEl = document.getElementById('completeModalText');
+
+    if (deadlineStr) {
+      var now = new Date();
+      var deadline = new Date(deadlineStr);
+      var diffMs = deadline - now;
+      var diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      var diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+      if (diffMs > 0) {
+        var timeStr = '';
+        if (diffDays > 0) {
+          timeStr = diffDays + ' ' + pluralize(diffDays, 'день', 'дня', 'дней');
+          if (diffHours > 0) {
+            timeStr += ' ' + diffHours + ' ' + pluralize(diffHours, 'час', 'часа', 'часов');
+          }
+        } else if (diffHours > 0) {
+          timeStr = diffHours + ' ' + pluralize(diffHours, 'час', 'часа', 'часов');
+        } else {
+          var diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+          timeStr = diffMinutes + ' ' + pluralize(diffMinutes, 'минута', 'минуты', 'минут');
+        }
+        textEl.textContent = 'Вы точно хотите завершить задачу? До её дедлайна осталось ' + timeStr + '.';
+      } else {
+        textEl.textContent = 'Вы точно хотите завершить задачу? Дедлайн уже прошёл.';
+      }
+    } else {
+      textEl.textContent = 'Вы точно хотите завершить задачу?';
+    }
+
+    document.getElementById('completeModal').style.display = 'flex';
+  }
+
+  function closeCompleteModal() {
+    completeTargetId = null;
+    document.getElementById('completeModal').style.display = 'none';
+  }
+
+  function pluralize(n, one, few, many) {
+    var mod10 = n % 10;
+    var mod100 = n % 100;
+    if (mod100 >= 11 && mod100 <= 19) return many;
+    if (mod10 === 1) return one;
+    if (mod10 >= 2 && mod10 <= 4) return few;
+    return many;
+  }
+
+  document.getElementById('deleteConfirmBtn').addEventListener('click', async function() {
+    if (!deleteTargetId) return;
+    try {
+      var resp = await authFetch('/api/tasks/' + deleteTargetId, { method: 'DELETE' });
+      if (resp.ok) {
+        closeDeleteModal();
+        showToast('Задание удалено');
+        setTimeout(function() { location.reload(); }, 800);
+      } else {
+        var data = await resp.json();
+        showToast(data.detail || 'Ошибка при удалении');
+      }
+    } catch (e) {
+      showToast('Ошибка сети');
+    }
+  });
+
+  document.getElementById('completeConfirmBtn').addEventListener('click', async function() {
+    if (!completeTargetId) return;
+    try {
+      var resp = await authFetch('/api/tasks/' + completeTargetId + '/complete', { method: 'POST' });
+      if (resp.ok) {
+        closeCompleteModal();
+        showToast('Задание завершено');
+        setTimeout(function() { location.reload(); }, 800);
+      } else {
+        var data = await resp.json();
+        showToast(data.detail || 'Ошибка');
+      }
+    } catch (e) {
+      showToast('Ошибка сети');
+    }
+  });
+
+  document.getElementById('deleteModal').addEventListener('click', function(e) {
+    if (e.target === this) closeDeleteModal();
+  });
+  document.getElementById('completeModal').addEventListener('click', function(e) {
+    if (e.target === this) closeCompleteModal();
+  });
+
+  function showToast(message) {
+    var toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.style.display = 'block';
+    toast.style.opacity = '1';
+    setTimeout(function() {
+      toast.style.opacity = '0';
+      setTimeout(function() { toast.style.display = 'none'; }, 300);
+    }, 2000);
+  }
+</script>
+{% endblock %}

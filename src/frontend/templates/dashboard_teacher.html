@@ -25,7 +25,7 @@
           <span class="stat-card__value">{{ students | map(attribute='group_name') | unique | list | length }}</span>
           <span class="stat-card__label">Группы</span>
         </article>
-        <article class="stat-card stat-card--accent">
+        <article class="stat-card stat-card--accent" style="cursor: pointer;" id="new-task-stat" title="Создать новое задание">
           <span class="stat-card__value">+</span>
           <span class="stat-card__label">Новое задание</span>
         </article>
@@ -45,12 +45,12 @@
             <article class="teacher-item" data-connection-id="{{ student.connection_id }}">
               <span class="avatar" aria-hidden="true">{{ student.last_name[0] if student.last_name else '' }}{{ student.first_name[0] if student.first_name else '' }}</span>
               <div class="teacher-info">
-                <span class="teacher-name">{{ student.last_name }} {{ student.first_name }}</span>
+                <span class="teacher-name">{{ student.last_name }} {{ student.first_name }} {{ student.middle_name }}</span>
                 <span class="teacher-email">
                   {% if student.course_number and student.group_name %}
-                    {{ student.course_number }}-{{ student.group_name }}
+                    Группа: {{ student.group_name }} &bull; {{ student.course_number }} курс
                   {% elif student.group_name %}
-                    {{ student.group_name }}
+                    Группа: {{ student.group_name }}
                   {% else %}
                     &mdash;
                   {% endif %}
@@ -111,6 +111,16 @@
     </div>
     <div class="task-modal__body">
       <form id="task-form" novalidate>
+        <div class="task-modal__field">
+          <label class="task-modal__label" for="task-group-select">Группа</label>
+          <select class="task-modal__input" id="task-group-select" name="group_select"
+            style="appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22%2386868b%22 d=%22M2 4l4 4 4-4%22/></svg>'); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;">
+            <option value="">Выберите группу...</option>
+          </select>
+          <span class="task-modal__field-error" id="error-group_select"></span>
+          <span id="no-groups-msg" style="display: none; color: #86868b; font-size: 13px; margin-top: 6px;">У вас пока нет прикреплённых групп.</span>
+        </div>
+
         <div class="task-modal__field">
           <label class="task-modal__label" for="task-title">Название задания</label>
           <input class="task-modal__input" type="text" id="task-title" name="title" placeholder="Например: Лабораторная работа №5" />

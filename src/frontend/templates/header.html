@@ -5,7 +5,11 @@
     {% if role == 'teacher' %}
       <a href="/dashboard/teacher" class="{% if active_page == '/dashboard/teacher' %}active{% endif %}">Главная</a>
       <a href="/students" class="{% if active_page == '/students' %}active{% endif %}">Студенты</a>
-      <a href="#">Группы</a>
+      <a href="/teacher/groups" class="{% if active_page == '/teacher/groups' %}active{% endif %}">Группы</a>
+      <a href="/teacher/tasks" class="{% if active_page == '/teacher/tasks' %}active{% endif %}">Выданные задания</a>
+      {% if user and user.is_admin %}
+        <a href="/admin/panel" class="{% if active_page == '/admin/panel' %}active{% endif %}">Админ панель</a>
+      {% endif %}
     {% else %}
       <a href="/dashboard/student" class="{% if active_page == '/dashboard/student' %}active{% endif %}">Главная</a>
       <a href="/teachers" class="{% if active_page == '/teachers' %}active{% endif %}">Преподаватели</a>

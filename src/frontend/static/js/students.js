@@ -4,11 +4,21 @@ function createStudentItem(student, actionsElement) {
   article.dataset.studentId = String(student.id);
   article.dataset.connectionId = String(student.connection_id || "");
 
+  const fullName = [student.last_name, student.first_name, student.middle_name].filter(Boolean).join(" ");
+  let subtitle = student.email;
+  if (student.group_name) {
+    subtitle = student.course_number
+      ? `Группа: ${student.group_name} \u2022 ${student.course_number} курс`
+      : `Группа: ${student.group_name}`;
+  }
+
+  const initials = ((student.last_name || "") + (student.first_name || "")).substring(0, 2).toUpperCase();
+
   article.innerHTML = `
-    <span class="avatar" aria-hidden="true">${student.email.charAt(0).toUpperCase()}</span>
+    <span class="avatar" aria-hidden="true">${initials || student.email.charAt(0).toUpperCase()}</span>
     <div class="teacher-info">
-      <span class="teacher-name">${student.first_name || ""}</span>
-      <span class="teacher-email">${student.email}</span>
+      <span class="teacher-name">${fullName || student.email}</span>
+      <span class="teacher-email">${subtitle}</span>
     </div>
   `;
 

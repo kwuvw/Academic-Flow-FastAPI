@@ -37,6 +37,8 @@ class SUserMeResponse(BaseModel):
     role: Literal["student", "teacher"]
     is_active: bool
     is_verified: bool
+    is_admin: bool = False
+    is_approved: bool = True
 
     first_name: str | None = None
     last_name: str | None = None
@@ -77,6 +79,10 @@ class SConnectionUser(BaseModel):
     email: EmailStr
     first_name: str | None = None
     last_name: str | None = None
+    middle_name: str | None = None
+    group_name: str | None = None
+    course_number: int | None = None
+    department: str | None = None
     connection_id: int | None = None
     status: Literal["pending", "accepted", "rejected"] | None = None
 

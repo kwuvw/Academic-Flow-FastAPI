@@ -46,7 +46,8 @@ async function loadCurrentUserName() {
     }
 
     const user = await response.json();
-    element.textContent = user.first_name || "";
+    const fullName = [user.last_name, user.first_name, user.middle_name].filter(Boolean).join(" ");
+    element.textContent = fullName || user.first_name || "";
   } catch {
     /* redirect handled in authFetch */
   }

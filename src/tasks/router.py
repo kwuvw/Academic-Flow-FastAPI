@@ -5,10 +5,11 @@ import traceback
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.dependencies import get_current_teacher
-from src.auth.models import User
+from src.auth.models import ConnectionStatus, User, UserConnection
 from src.database import get_async_session
 from src.tasks.models import Task
 
@@ -20,6 +21,44 @@ router = APIRouter(
 UPLOAD_DIR = os.path.join("src", "frontend", "static", "uploads", "tasks")
 ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".pdf", ".doc", ".docx"}
 MAX_FILE_SIZE = 10 * 1024 * 1024
+
+
+@router.get("/my-groups")
+async def get_my_groups(
+    current_user: User = Depends(get_current_teacher),
+    session: AsyncSession = Depends(get_async_session),
+):
+    conn_query = select(UserConnection.student_id).where(
+        UserConnection.teacher_id == current_user.id,
+        UserConnection.status == ConnectionStatus.accepted,
+    )
+    conn_result = await session.execute(conn_query)
+    student_ids = list(conn_result.scalars().all())
+
+    if not student_ids:
+        return []
+
+    students_q = select(User).where(
+        User.id.in_(student_ids),
+        User.role == "student",
+        User.group_name.isnot(None),
+        User.group_name != "",
+    )
+    result = await session.execute(students_q)
+    students = result.scalars().all()
+
+    groups_map: dict[tuple[str, int], str] = {}
+    for s in students:
+        key = (s.group_name, s.course_number or 0)
+        if key not in groups_map:
+            label = f"{s.course_number}-" if s.course_number else ""
+            label += s.group_name
+            groups_map[key] = label
+
+    return [
+        {"group_name": gn, "course_number": cn, "label": lbl}
+        for (gn, cn), lbl in sorted(groups_map.items(), key=lambda x: (x[0][1], x[0][0]))
+    ]
 
 
 @router.post("/create", status_code=status.HTTP_201_CREATED)
@@ -157,3 +196,71 @@ async def create_task(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Ошибка при создании задания: {str(e)}",
         )
+
+
+@router.delete("/{task_id}", status_code=status.HTTP_200_OK)
+async def delete_task(
+    task_id: int,
+    current_user: User = Depends(get_current_teacher),
+    session: AsyncSession = Depends(get_async_session),
+):
+    from sqlalchemy import select as sa_select
+
+    query = sa_select(Task).where(Task.id == task_id, Task.teacher_id == current_user.id)
+    result = await session.execute(query)
+    task = result.scalar_one_or_none()
+
+    if not task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Задание не найдено или у вас нет прав для его удаления.",
+        )
+
+    if task.file_paths:
+        try:
+            paths = json.loads(task.file_paths)
+            for p in paths:
+                full_path = os.path.join("src", "frontend", p.lstrip("/"))
+                if os.path.exists(full_path):
+                    os.remove(full_path)
+        except (json.JSONDecodeError, TypeError, OSError):
+            pass
+
+    await session.delete(task)
+    await session.commit()
+
+    return {"status": "success", "message": "Задание удалено"}
+
+
+@router.post("/{task_id}/complete", status_code=status.HTTP_200_OK)
+async def complete_task(
+    task_id: int,
+    current_user: User = Depends(get_current_teacher),
+    session: AsyncSession = Depends(get_async_session),
+):
+    from sqlalchemy import select as sa_select
+
+    query = sa_select(Task).where(Task.id == task_id, Task.teacher_id == current_user.id)
+    result = await session.execute(query)
+    task = result.scalar_one_or_none()
+
+    if not task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Задание не найдено или у вас нет прав.",
+        )
+
+    if task.file_paths:
+        try:
+            paths = json.loads(task.file_paths)
+            for p in paths:
+                full_path = os.path.join("src", "frontend", p.lstrip("/"))
+                if os.path.exists(full_path):
+                    os.remove(full_path)
+        except (json.JSONDecodeError, TypeError, OSError):
+            pass
+
+    await session.delete(task)
+    await session.commit()
+
+    return {"status": "success", "message": "Задание завершено"}

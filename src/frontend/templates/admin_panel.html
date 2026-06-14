@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block content %}
+<main class="teachers-page connections-page">
+  <section class="page-section">
+    <div class="page-section__header">
+      <h2>Панель администратора</h2>
+      <p class="subtitle">Управление пользователями, группами и модерация преподавателей.</p>
+    </div>
+
+    <div id="stats-bar" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 28px;">
+      <div style="background: rgba(255,255,255,0.72); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.18); border-radius: 16px; padding: 18px 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.04);">
+        <span style="display: block; font-size: 28px; font-weight: 700; color: #1d1d1f;" id="stat-students">—</span>
+        <span style="font-size: 13px; color: #86868b; font-weight: 500;">Студентов</span>
+      </div>
+      <div style="background: rgba(255,255,255,0.72); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.18); border-radius: 16px; padding: 18px 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.04);">
+        <span style="display: block; font-size: 28px; font-weight: 700; color: #1d1d1f;" id="stat-teachers">—</span>
+        <span style="font-size: 13px; color: #86868b; font-weight: 500;">Преподавателей</span>
+      </div>
+      <div style="background: rgba(255,255,255,0.72); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.18); border-radius: 16px; padding: 18px 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.04);">
+        <span style="display: block; font-size: 28px; font-weight: 700; color: #1d1d1f;" id="stat-groups">—</span>
+        <span style="font-size: 13px; color: #86868b; font-weight: 500;">Групп</span>
+      </div>
+      <div style="background: rgba(255,255,255,0.72); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.18); border-radius: 16px; padding: 18px 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.04);">
+        <span style="display: block; font-size: 28px; font-weight: 700; color: #1d1d1f;" id="stat-tasks">—</span>
+        <span style="font-size: 13px; color: #86868b; font-weight: 500;">Заданий</span>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 4px; margin-bottom: 24px; background: #f0efee; border-radius: 12px; padding: 4px; width: fit-content;">
+      <button class="tab-btn active" data-tab="requests" onclick="switchTab('requests')">Заявки</button>
+      <button class="tab-btn" data-tab="users" onclick="switchTab('users')">Пользователи</button>
+      <button class="tab-btn" data-tab="groups" onclick="switchTab('groups')">Группы</button>
+    </div>
+
+    <div id="tab-requests" class="tab-content">
+      <div class="teacher-list" id="pending-list">
+        {% if pending_teachers %}
+          {% for teacher in pending_teachers %}
+            <article class="teacher-item" style="flex-direction: row; align-items: center; gap: 16px; border-radius: 20px; padding: 20px 22px;" data-teacher-id="{{ teacher.id }}">
+              <div class="avatar" style="width: 48px; height: 48px; border-radius: 50%; background-color: #e5e5ea; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <span style="font-size: 18px; font-weight: 700; color: #1d1d1f;">{{ teacher.full_name[0] if teacher.full_name else '?' }}</span>
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <span class="teacher-name" style="font-size: 17px; font-weight: 700;">{{ teacher.full_name }}</span>
+                <br />
+                <span style="color: #86868b; font-size: 14px;">
+                  {% if teacher.department %}{{ teacher.department }} &bull; {% endif %}{{ teacher.email }}
+                </span>
+              </div>
+              <div style="display: flex; gap: 10px; flex-shrink: 0;">
+                <button type="button" class="approve-btn" data-id="{{ teacher.id }}"
+                  style="background-color: #34c759; color: #fff; border: none; padding: 10px 22px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer;">Принять</button>
+                <button type="button" class="reject-btn" data-id="{{ teacher.id }}"
+                  style="background-color: #1d1d1f; color: #fff; border: none; padding: 10px 22px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer;">Отклонить</button>
+              </div>
+            </article>
+          {% endfor %}
+        {% else %}
+          <div id="empty-requests" style="background: #fff; border-radius: 20px; padding: 48px 40px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.06); text-align: center; border: 2px dashed #e5e5ea;">
+            <p style="margin: 0; color: #86868b; font-size: 15px;">Новых заявок пока нет</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div id="tab-users" class="tab-content" style="display: none;">
+      <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+        <button class="filter-btn active" data-filter="all" onclick="filterUsers('all', this)">Все</button>
+        <button class="filter-btn" data-filter="student" onclick="filterUsers('student', this)">Студенты</button>
+        <button class="filter-btn" data-filter="teacher" onclick="filterUsers('teacher', this)">Преподаватели</button>
+      </div>
+      <div class="teacher-list" id="users-list"></div>
+    </div>
+
+    <div id="tab-groups" class="tab-content" style="display: none;">
+      <div class="teacher-list" id="groups-list"></div>
+    </div>
+  </section>
+</main>
+
+<div id="toast" style="display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1d1d1f; color: #fff; padding: 14px 28px; border-radius: 14px; font-size: 15px; font-weight: 600; box-shadow: 0 8px 32px rgba(0,0,0,0.18); z-index: 2000; opacity: 0; transition: opacity 0.3s ease;"></div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+  .tab-btn {
+    background: transparent; border: none; padding: 10px 22px; border-radius: 10px;
+    font-size: 14px; font-weight: 600; color: #86868b; cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .tab-btn.active { background: #fff; color: #1d1d1f; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .tab-btn:hover:not(.active) { color: #1d1d1f; }
+  .filter-btn {
+    background: #f0efee; border: none; padding: 8px 18px; border-radius: 10px;
+    font-size: 13px; font-weight: 600; color: #86868b; cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .filter-btn.active { background: #1d1d1f; color: #fff; }
+  .filter-btn:hover:not(.active) { background: #e5e5ea; color: #1d1d1f; }
+</style>
+<script>
+  function showToast(message) {
+    var toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.style.display = "block";
+    toast.style.opacity = "1";
+    setTimeout(function() { toast.style.opacity = "0"; setTimeout(function() { toast.style.display = "none"; }, 300); }, 2000);
+  }
+
+  function switchTab(tab) {
+    document.querySelectorAll(".tab-content").forEach(function(el) { el.style.display = "none"; });
+    document.querySelectorAll(".tab-btn").forEach(function(el) { el.classList.remove("active"); });
+    document.getElementById("tab-" + tab).style.display = "block";
+    document.querySelector('[data-tab="' + tab + '"]').classList.add("active");
+
+    if (tab === "users") loadUsers("all");
+    if (tab === "groups") loadGroups();
+  }
+
+  /* ─── Статистика ─────────────────────────────────── */
+  async function loadStats() {
+    try {
+      var r = await authFetch("/api/admin/stats");
+      if (!r.ok) return;
+      var d = await r.json();
+      document.getElementById("stat-students").textContent = d.total_students;
+      document.getElementById("stat-teachers").textContent = d.total_teachers;
+      document.getElementById("stat-groups").textContent = d.total_groups;
+      document.getElementById("stat-tasks").textContent = d.total_tasks;
+    } catch (e) {}
+  }
+
+  /* ─── Заявки (approve / reject) ──────────────────── */
+  document.querySelectorAll(".approve-btn").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      var id = this.dataset.id; this.disabled = true; this.textContent = "...";
+      try {
+        var r = await authFetch("/auth/admin/approve/" + id, { method: "POST" });
+        if (r.ok) { var c = document.querySelector('[data-teacher-id="' + id + '"]'); if (c) c.remove(); showToast("Преподаватель одобрен"); checkEmptyRequests(); loadStats(); }
+        else { var d = await r.json().catch(function(){return null;}); showToast(d?.detail || "Ошибка"); this.disabled = false; this.textContent = "Принять"; }
+      } catch (e) { showToast("Ошибка сети"); this.disabled = false; this.textContent = "Принять"; }
+    });
+  });
+  document.querySelectorAll(".reject-btn").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      var id = this.dataset.id; this.disabled = true; this.textContent = "...";
+      try {
+        var r = await authFetch("/auth/admin/reject/" + id, { method: "POST" });
+        if (r.ok) { var c = document.querySelector('[data-teacher-id="' + id + '"]'); if (c) c.remove(); showToast("Преподаватель отклонён"); checkEmptyRequests(); loadStats(); }
+        else { var d = await r.json().catch(function(){return null;}); showToast(d?.detail || "Ошибка"); this.disabled = false; this.textContent = "Отклонить"; }
+      } catch (e) { showToast("Ошибка сети"); this.disabled = false; this.textContent = "Отклонить"; }
+    });
+  });
+  function checkEmptyRequests() {
+    var list = document.getElementById("pending-list");
+    if (list && list.querySelectorAll(".teacher-item").length === 0) {
+      list.innerHTML = '<div id="empty-requests" style="background:#fff;border-radius:20px;padding:48px 40px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.06);text-align:center;border:2px dashed #e5e5ea;"><p style="margin:0;color:#86868b;font-size:15px;">Новых заявок пока нет</p></div>';
+    }
+  }
+
+  /* ─── Пользователи ───────────────────────────────── */
+  var allUsersData = [];
+  async function loadUsers(role) {
+    var list = document.getElementById("users-list");
+    list.innerHTML = '<p style="color:#86868b;font-size:14px;">Загрузка...</p>';
+    try {
+      var url = "/api/admin/users" + (role && role !== "all" ? "?role=" + role : "");
+      var r = await authFetch(url);
+      if (!r.ok) { list.innerHTML = '<p style="color:#86868b;">Ошибка загрузки</p>'; return; }
+      allUsersData = await r.json();
+      renderUsers(allUsersData);
+    } catch (e) { list.innerHTML = '<p style="color:#86868b;">Ошибка сети</p>'; }
+  }
+  function renderUsers(users) {
+    var list = document.getElementById("users-list");
+    if (!users.length) { list.innerHTML = '<div style="background:#fff;border-radius:20px;padding:48px 40px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.06);text-align:center;border:2px dashed #e5e5ea;"><p style="margin:0;color:#86868b;font-size:15px;">Пользователей нет</p></div>'; return; }
+    var html = "";
+    users.forEach(function(u) {
+      var fullName = [u.last_name, u.first_name, u.middle_name].filter(Boolean).join(" ") || u.email;
+      var initials = ((u.last_name || "") + (u.first_name || "")).substring(0, 2).toUpperCase() || u.email.charAt(0).toUpperCase();
+      var roleLabel = u.role === "teacher" ? "Преподаватель" : "Студент";
+      var roleColor = u.role === "teacher" ? "#ff9f0a" : "#007aff";
+      var sub = u.email;
+      if (u.role === "teacher" && u.department) sub = u.department + " • " + u.email;
+      if (u.role === "student" && u.group_name) sub = "Группа: " + u.group_name + (u.course_number ? " • " + u.course_number + " курс" : "") + " • " + u.email;
+      var badges = "";
+      if (u.is_admin) badges += '<span style="background:#ff3b30;color:#fff;font-size:11px;padding:2px 8px;border-radius:6px;font-weight:600;">Admin</span> ';
+      if (u.role === "teacher" && !u.is_approved) badges += '<span style="background:#ff9f0a;color:#fff;font-size:11px;padding:2px 8px;border-radius:6px;font-weight:600;">Не одобрен</span> ';
+      html += '<article class="teacher-item" style="flex-direction:row;align-items:center;gap:16px;border-radius:20px;padding:20px 22px;" data-user-id="' + u.id + '">'
+        + '<div class="avatar" style="width:44px;height:44px;border-radius:50%;background:#e5e5ea;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span style="font-size:16px;font-weight:700;color:#1d1d1f;">' + initials + '</span></div>'
+        + '<div style="flex:1;min-width:0;">'
+        + '<span class="teacher-name" style="font-size:16px;font-weight:700;">' + fullName + ' ' + badges + '</span>'
+        + '<br /><span style="color:#86868b;font-size:13px;">' + roleLabel + ' &bull; ' + sub + '</span>'
+        + '</div>'
+        + '<button type="button" class="delete-user-btn" data-id="' + u.id + '" style="background:transparent;color:#ff3b30;border:none;padding:10px 18px;border-radius:12px;font-weight:600;font-size:14px;cursor:pointer;flex-shrink:0;">Удалить</button>'
+        + '</article>';
+    });
+    list.innerHTML = html;
+    list.querySelectorAll(".delete-user-btn").forEach(function(btn) {
+      btn.addEventListener("click", async function() {
+        var id = this.dataset.id;
+        if (!confirm("Удалить пользователя? Это действие необратимо.")) return;
+        this.disabled = true; this.textContent = "...";
+        try {
+          var r = await authFetch("/api/admin/users/" + id, { method: "DELETE" });
+          if (r.ok) { var card = document.querySelector('[data-user-id="' + id + '"]'); if (card) card.remove(); showToast("Пользователь удалён"); loadStats(); }
+          else { var d = await r.json().catch(function(){return null;}); showToast(d?.detail || "Ошибка"); this.disabled = false; this.textContent = "Удалить"; }
+        } catch (e) { showToast("Ошибка сети"); this.disabled = false; this.textContent = "Удалить"; }
+      });
+    });
+  }
+  function filterUsers(role, btn) {
+    document.querySelectorAll(".filter-btn").forEach(function(b) { b.classList.remove("active"); });
+    btn.classList.add("active");
+    if (role === "all") { renderUsers(allUsersData); }
+    else { renderUsers(allUsersData.filter(function(u) { return u.role === role; })); }
+  }
+
+  /* ─── Группы ─────────────────────────────────────── */
+  async function loadGroups() {
+    var list = document.getElementById("groups-list");
+    list.innerHTML = '<p style="color:#86868b;font-size:14px;">Загрузка...</p>';
+    try {
+      var r = await authFetch("/api/admin/groups");
+      if (!r.ok) { list.innerHTML = '<p style="color:#86868b;">Ошибка загрузки</p>'; return; }
+      var groups = await r.json();
+      if (!groups.length) { list.innerHTML = '<div style="background:#fff;border-radius:20px;padding:48px 40px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.06);text-align:center;border:2px dashed #e5e5ea;"><p style="margin:0;color:#86868b;font-size:15px;">Групп пока нет</p></div>'; return; }
+      var html = "";
+      groups.forEach(function(g) {
+        var teachers = g.teacher_names.length ? g.teacher_names.join(", ") : "—";
+        html += '<article class="teacher-item" style="flex-direction:row;align-items:center;gap:16px;border-radius:20px;padding:20px 22px;">'
+          + '<div class="avatar" style="width:48px;height:48px;border-radius:50%;background:#e5e5ea;display:flex;align-items:center;justify-content:center;flex-shrink:0;">'
+          + '<span style="font-size:18px;font-weight:700;color:#1d1d1f;">' + (g.group_name.charAt(0).toUpperCase()) + '</span></div>'
+          + '<div style="flex:1;min-width:0;">'
+          + '<span class="teacher-name" style="font-size:17px;font-weight:700;">' + g.group_name + ' (' + g.course_number + ' курс)</span>'
+          + '<br /><span style="color:#86868b;font-size:14px;">Студентов: ' + g.student_count + ' &bull; Преподаватель: ' + teachers + '</span>'
+          + '</div></article>';
+      });
+      list.innerHTML = html;
+    } catch (e) { list.innerHTML = '<p style="color:#86868b;">Ошибка сети</p>'; }
+  }
+
+  /* ─── Init ───────────────────────────────────────── */
+  loadStats();
+</script>
+{% endblock %}
