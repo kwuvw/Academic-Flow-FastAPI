@@ -20,11 +20,11 @@
           <span class="stat-card__label">Преподавателя</span>
         </article>
         <article class="stat-card">
-          <span class="stat-card__value">2</span>
+          <span class="stat-card__value">{{ tasks|length }}</span>
           <span class="stat-card__label">Активных задания</span>
         </article>
         <article class="stat-card stat-card--accent">
-          <span class="stat-card__value">10.04</span>
+          <span class="stat-card__value">{{ nearest_deadline }}</span>
           <span class="stat-card__label">Ближайший дедлайн</span>
         </article>
       </div>
@@ -64,51 +64,80 @@
         </p>
       </div>
       <div class="task-list">
-        <article class="task-item">
-          <span class="task-icon" aria-hidden="true"></span>
-          <div class="task-content">
-            <p class="task-title">
-              Создать простую базу данных, используя учебные материалы из файла
-            </p>
-            <div class="task-actions">
-              <button type="button" class="btn-primary">Скачать файл</button>
-              <button type="button" class="btn-secondary white-text">Задание.PDF</button>
-            </div>
-            <p class="task-dates"><span class="task-dates__label">Срок:</span> с 01.04.2026 до 10.04.2026</p>
-          </div>
-        </article>
-
-        <article class="task-item">
-          <span class="task-icon" aria-hidden="true"></span>
-          <div class="task-content">
-            <p class="task-title">Написать калькулятор на Android Studio</p>
-            <div class="task-actions">
-              <button type="button" class="btn-primary">Скачать файл</button>
-              <button type="button" class="btn-secondary white-text">CalculatorTZ.PDF</button>
-            </div>
-            <p class="task-dates"><span class="task-dates__label">Срок:</span> с 09.01.2026 до 20.04.2026</p>
-          </div>
-        </article>
+        {% if tasks %}
+          {% for task in tasks %}
+            <article class="task-item">
+              <span class="task-icon" aria-hidden="true"></span>
+              <div class="task-content">
+                <p class="task-title">
+                  {{ task.title }}
+                  {% if task.is_burning %}
+                    <span style="margin-left: 5px;" title="До дедлайна меньше недели!">🔥</span>
+                  {% endif %}
+                </p>
+                {% if task.description %}
+                  <p class="task-description">{{ task.description }}</p>
+                {% endif %}
+                {% if task.file_paths or task.file_path %}
+                  <div class="task-buttons-container" style="display: flex; gap: 10px; margin-top: 15px; align-items: center;">
+                    <a href="{{ task.file_paths if task.file_paths else task.file_path }}"
+                       download="{{ task.file_original_name if task.file_original_name else 'Задание' }}"
+                       class="btn btn-warning"
+                       style="background-color: #ff9f0a; color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: bold; text-decoration: none; display: inline-block;">
+                      Скачать файл
+                    </a>
+                    <div class="file-name-badge"
+                         style="background-color: #000000; color: white; padding: 10px 20px; border-radius: 12px; font-weight: bold; display: inline-block; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                      {{ task.file_original_name if task.file_original_name else 'Прикрепленный файл.pdf' }}
+                    </div>
+                  </div>
+                {% endif %}
+                <p class="task-dates">
+                  <span class="task-dates__label">Срок:</span>
+                  {% if task.deadline %}
+                    до {{ task.deadline.strftime('%d.%m.%Y %H:%M') }}
+                  {% else %}
+                    не установлен
+                  {% endif %}
+                </p>
+                {% if task.teacher_name %}
+                  <p class="task-author" style="color: #86868b; font-size: 14px; margin-top: 5px; margin-bottom: 0;">
+                    <span style="font-weight: 500;">Преподаватель:</span> {{ task.teacher_name }}
+                  </p>
+                {% endif %}
+              </div>
+            </article>
+          {% endfor %}
+        {% else %}
+          <p class="empty-state">У вас пока нет актуальных заданий.</p>
+        {% endif %}
       </div>
     </section>
   </div>
 
   <aside class="dashboard-sidebar">
     <div class="sidebar-card sidebar-card--dark">
-      <h3 class="sidebar-card__title">На этой неделе</h3>
-      <p class="sidebar-card__text">Два задания требуют внимания до конца месяца.</p>
-      <ul class="sidebar-deadlines">
-        <li>
-          <span class="sidebar-deadlines__date">10.04</span>
-          <span class="sidebar-deadlines__name">База данных</span>
-        </li>
-        <li>
-          <span class="sidebar-deadlines__date">20.04</span>
-          <span class="sidebar-deadlines__name">Android Studio</span>
-        </li>
-      </ul>
+      <h3 class="sidebar-card__title">Задания</h3>
+      {% if tasks %}
+        <p class="sidebar-card__text">
+          Эти задания требуют внимания в скором времени.
+        </p>
+        <ul class="sidebar-deadlines">
+          {% for task in tasks[:3] %}
+            {% if task.deadline %}
+              <li>
+                <span class="sidebar-deadlines__date">{{ task.deadline.strftime('%d.%m') }}</span>
+                <span class="sidebar-deadlines__name">
+                  {{ task.title }}{% if task.is_burning %} 🔥{% endif %}
+                </span>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="sidebar-card__text">Нет ближайших дедлайнов.</p>
+      {% endif %}
     </div>
-    <div class="chart-visual" aria-hidden="true"></div>
   </aside>
 </main>
 {% endblock %}

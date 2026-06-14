@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block content %}
+<main class="teachers-page connections-page">
+  <section class="page-section">
+    <div class="page-section__header">
+      <h2>Задания твоей группы</h2>
+      <p class="subtitle">Все задания по твоей группе и курсу.</p>
+    </div>
+
+    <div class="teacher-list">
+      {% if tasks %}
+        {% for task in tasks %}
+          <article class="teacher-item" style="flex-direction: column; align-items: flex-start; gap: 12px;">
+            <div style="width: 100%;">
+              <span class="teacher-name" style="font-size: 18px; font-weight: 700;">
+                {{ task.title }}
+                {% if task.is_burning %}
+                  <span style="margin-left: 5px;" title="До дедлайна меньше недели!">🔥</span>
+                {% endif %}
+              </span>
+            </div>
+
+            {% if task.description %}
+              <p style="margin: 0; color: #1d1d1f; font-size: 15px; line-height: 1.5;">{{ task.description }}</p>
+            {% endif %}
+
+            {% if task.teacher_name %}
+              <p style="margin: 0; color: #86868b; font-size: 14px;">
+                Преподаватель: {{ task.teacher_name }}
+              </p>
+            {% endif %}
+
+            {% if task.deadline %}
+              <p style="margin: 0; color: #86868b; font-size: 14px;">
+                Срок: до {{ task.deadline.strftime('%d.%m.%Y %H:%M') }}
+              </p>
+            {% endif %}
+
+            {% if task.file_path %}
+              <div style="display: flex; gap: 10px; margin-top: 8px; align-items: center;">
+                <a href="{{ task.file_path }}"
+                   download="{{ task.file_original_name if task.file_original_name else 'Задание' }}"
+                   style="background-color: #ff9f0a; color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: bold; text-decoration: none; display: inline-block;">
+                  Скачать файл
+                </a>
+                <div style="background-color: #000000; color: white; padding: 10px 20px; border-radius: 12px; font-weight: bold; display: inline-block; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  {{ task.file_original_name if task.file_original_name else 'Прикрепленный файл' }}
+                </div>
+              </div>
+            {% endif %}
+          </article>
+        {% endfor %}
+      {% else %}
+        <p class="subtitle">У тебя пока нет заданий.</p>
+      {% endif %}
+    </div>
+  </section>
+</main>
+{% endblock %}

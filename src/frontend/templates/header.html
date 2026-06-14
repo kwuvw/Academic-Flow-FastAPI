@@ -9,8 +9,8 @@
     {% else %}
       <a href="/dashboard/student" class="{% if active_page == '/dashboard/student' %}active{% endif %}">Главная</a>
       <a href="/teachers" class="{% if active_page == '/teachers' %}active{% endif %}">Преподаватели</a>
-      <a href="#">Твои задания</a>
-      <a href="#">Горишь🔥</a>
+      <a href="/tasks/my" class="{% if active_page == '/tasks/my' %}active{% endif %}">Мои задания</a>
+      <a href="/tasks/burning" class="{% if active_page == '/tasks/burning' %}active{% endif %}">Горишь🔥</a>
     {% endif %}
     <a href="/profile" class="{% if active_page == '/profile' %}active{% endif %}">Профиль</a>
   </nav>

@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import User, UserRole
 from src.config import settings
-from src.core.database import get_async_session
+from src.database import get_async_session
 
 
 async def get_current_user(

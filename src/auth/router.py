@@ -9,7 +9,7 @@ from src.auth.models import User
 from src.auth.schemas import SUpdateProfile, SUserLogin, SUserMeResponse, SUserRegister, SUserResponse
 from src.auth.service import UserDAO
 from src.auth.utils import create_access_token, verify_password
-from src.core.database import get_async_session
+from src.database import get_async_session
 
 router = APIRouter(
     prefix="/auth",

@@ -121,5 +121,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="/static/js/profile.js?v=4"></script>
+<script src="{{ url_for('static', path='js/profile.js') }}?v=4"></script>
 {% endblock %}

@@ -11,7 +11,7 @@ from src.auth.schemas import (
     SMyStudentsResponse,
     SMyTeachersResponse,
 )
-from src.core.database import get_async_session
+from src.database import get_async_session
 
 router = APIRouter(
     prefix="/auth/connections",

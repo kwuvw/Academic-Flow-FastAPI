@@ -19,8 +19,9 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from src.auth.models import User, UserConnection  # noqa: F401 — register models for autogenerate
+from src.tasks.models import Task  # noqa: F401
 from src.config import settings
-from src.core.database import Base
+from src.database import Base
 
 config = context.config
 
