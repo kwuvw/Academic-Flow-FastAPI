@@ -7,7 +7,6 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-from datetime import datetime, timezone
 from src.auth.dependencies import get_current_user, get_current_teacher, get_optional_user
 from src.auth.models import ConnectionStatus, User, UserConnection
 from src.database import get_async_session

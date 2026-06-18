@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -147,12 +146,6 @@ async def get_groups(
     for s in students:
         key = (s.group_name or "—", s.course_number or 0)
         groups_map.setdefault(key, []).append(s)
-
-    teacher_ids = set()
-    for members in groups_map.values():
-        for m in members:
-            if hasattr(m, "teacher_id"):
-                pass
 
     conn_q = await session.execute(
         select(UserConnection).where(UserConnection.status == ConnectionStatus.accepted)

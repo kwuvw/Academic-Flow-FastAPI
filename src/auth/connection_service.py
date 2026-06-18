@@ -50,7 +50,11 @@ class ConnectionDAO:
 
     @classmethod
     async def list_all_teachers(cls, session: AsyncSession) -> list[User]:
-        query = select(User).where(User.role == UserRole.teacher, User.is_active.is_(True))
+        query = select(User).where(
+            User.role == UserRole.teacher,
+            User.is_active.is_(True),
+            User.is_admin == False,
+        )
         result = await session.execute(query)
         return list(result.scalars().all())
 

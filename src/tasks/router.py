@@ -1,7 +1,6 @@
 import json
 import os
 import uuid
-import traceback
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
@@ -89,8 +88,7 @@ async def create_task(
         if deadline and deadline.strip():
             try:
                 parsed_deadline = datetime.fromisoformat(deadline.strip())
-            except (ValueError, TypeError) as e:
-                print(f"[tasks/create] Ошибка парсинга даты '{deadline}': {e}")
+            except (ValueError, TypeError):
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=f"Неверный формат даты: {deadline}. Используйте YYYY-MM-DDTHH:MM.",
@@ -103,7 +101,6 @@ async def create_task(
                 if val > 0:
                     parsed_course = val
             except (ValueError, TypeError):
-                print(f"[tasks/create] Не удалось распарсить course_number: '{course_number}'")
                 parsed_course = None
 
         saved_paths = []
@@ -113,17 +110,13 @@ async def create_task(
             os.makedirs(UPLOAD_DIR, exist_ok=True)
             for upload_file in files:
                 if not upload_file or not upload_file.filename:
-                    print(f"[tasks/create] Пропущен файл без filename: {upload_file}")
                     continue
 
                 original_filename = upload_file.filename
-                print(f"[tasks/create] Обработка файла: filename='{original_filename}'")
-
                 file_content = await upload_file.read()
                 file_size = len(file_content)
 
                 if file_size == 0:
-                    print(f"[tasks/create] Пропущен пустой файл: {original_filename}")
                     continue
 
                 if file_size > MAX_FILE_SIZE:
@@ -147,14 +140,9 @@ async def create_task(
 
                 saved_paths.append(f"/static/uploads/tasks/{safe_name}")
                 original_names.append(original_filename)
-                print(f"[tasks/create] Файл сохранён: {file_path}, оригинальное имя: '{original_filename}'")
 
         file_paths_json = json.dumps(saved_paths) if saved_paths else None
         original_names_json = json.dumps(original_names) if original_names else None
-
-        print(f"[tasks/create] Перед сохранением в БД:")
-        print(f"  file_paths_json = {file_paths_json}")
-        print(f"  original_names_json = {original_names_json}")
 
         task = Task(
             teacher_id=current_user.id,
@@ -170,9 +158,6 @@ async def create_task(
         session.add(task)
         await session.commit()
         await session.refresh(task)
-
-        print(f"[tasks/create] Задание создано: id={task.id}")
-        print(f"[tasks/create] Проверка из БД: file_original_name='{task.file_original_name}'")
 
         return {
             "status": "success",
@@ -190,8 +175,6 @@ async def create_task(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"[tasks/create] НЕОЖИДАННАЯ ОШИБКА: {e}")
-        print(traceback.format_exc())
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Ошибка при создании задания: {str(e)}",
@@ -204,9 +187,7 @@ async def delete_task(
     current_user: User = Depends(get_current_teacher),
     session: AsyncSession = Depends(get_async_session),
 ):
-    from sqlalchemy import select as sa_select
-
-    query = sa_select(Task).where(Task.id == task_id, Task.teacher_id == current_user.id)
+    query = select(Task).where(Task.id == task_id, Task.teacher_id == current_user.id)
     result = await session.execute(query)
     task = result.scalar_one_or_none()
 
@@ -238,9 +219,7 @@ async def complete_task(
     current_user: User = Depends(get_current_teacher),
     session: AsyncSession = Depends(get_async_session),
 ):
-    from sqlalchemy import select as sa_select
-
-    query = sa_select(Task).where(Task.id == task_id, Task.teacher_id == current_user.id)
+    query = select(Task).where(Task.id == task_id, Task.teacher_id == current_user.id)
     result = await session.execute(query)
     task = result.scalar_one_or_none()
 

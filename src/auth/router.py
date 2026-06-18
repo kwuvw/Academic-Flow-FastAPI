@@ -1,5 +1,3 @@
-import re
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -135,28 +133,6 @@ async def update_profile(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_async_session),
 ):
-    if update_data.course_number is not None and not 1 <= update_data.course_number <= 4:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Номер курса должен быть от 1 до 4",
-        )
-
-    name_pattern = re.compile(r"^[а-яёА-ЯЁ\s\-]+$")
-    for field_name in ("first_name", "last_name", "middle_name"):
-        value = getattr(update_data, field_name, None)
-        if value and not name_pattern.match(value):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Поле «{field_name}» должно содержать только буквы (кириллица)",
-            )
-
-    allowed_groups = {"ГД", "Д", "ИЗ", "ИС", "КМ", "Т", "СА", "Р", "ПП", "ОН", "БУХ", "МС"}
-    if update_data.group_name and update_data.group_name not in allowed_groups:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Допустимые группы: {', '.join(sorted(allowed_groups))}",
-        )
-
     filtered_data = update_data.model_dump(exclude_unset=True)
     if filtered_data:
         current_user = await UserDAO.update_user(session, current_user, filtered_data)
