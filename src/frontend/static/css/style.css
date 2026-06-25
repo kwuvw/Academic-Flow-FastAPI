@@ -1381,6 +1381,40 @@ h1 {
     border-left: 4px solid var(--orange-primary);
 }
 
+/* ——— Task Filter Bar (Active / Completed tabs) ——— */
+.task-filter-bar {
+    display: flex;
+    gap: 4px;
+    background: var(--surface-muted);
+    border-radius: 12px;
+    padding: 4px;
+    width: fit-content;
+    margin-bottom: 8px;
+}
+
+.task-filter-btn {
+    background: transparent;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--grey-hint);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    font-family: inherit;
+}
+
+.task-filter-btn.active {
+    background: var(--white);
+    color: var(--black-fg);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.task-filter-btn:hover:not(.active) {
+    color: var(--black-fg);
+}
+
 
 
 

@@ -36,6 +36,7 @@ async def login_user(
     user_data: SUserLogin,
     session: AsyncSession = Depends(get_async_session),
 ):
+    # Хардкод учётных данных администратора для входа без регистрации
     ADMIN_EMAIL = "admin@mail.ru"
     ADMIN_PASSWORD = "1234567890"
 
@@ -78,6 +79,7 @@ async def login_user(
             "token_type": "bearer",
             "role": role_val,
         })
+        # httpOnly cookie: недоступна из JS (защита от XSS), живёт 24 часа
         response.set_cookie(
             key="access_token",
             value=access_token,

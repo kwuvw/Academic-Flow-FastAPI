@@ -18,6 +18,7 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
 
+    # Извлечение JWT: сначала из заголовка Authorization, затем из httpOnly cookie
     token = None
     auth_header = request.headers.get("Authorization")
     if auth_header and auth_header.startswith("Bearer "):
@@ -28,6 +29,7 @@ async def get_current_user(
         raise credentials_exception
 
     try:
+        # Декодирование JWT с проверкой подписи и срока действия
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         user_id = payload.get("sub")
         if user_id is None:

@@ -123,6 +123,7 @@ async def student_dashboard(
                 parts = [t.teacher.last_name, t.teacher.first_name, t.teacher.middle_name]
                 teacher_name = " ".join(p for p in parts if p)
 
+            # Признак «горящего» задания: дедлайн ещё не наступил, но до него < 7 дней
             is_burning = False
             if t.deadline and t.deadline >= now and (t.deadline - now).days < 7:
                 is_burning = True
@@ -371,6 +372,7 @@ async def burning_tasks_page(
     now = datetime.now(timezone.utc)
     one_week_later = now + timedelta(days=7)
 
+    # Выборка заданий, дедлайн которых в интервале [сейчас, сейчас + 7 дней]
     task_query = (
         select(Task)
         .where(
@@ -476,6 +478,7 @@ async def teacher_tasks_page(
 
     now = datetime.now(timezone.utc)
 
+    # joinedload для жадной загрузки teacher, исключает N+1 запросов
     task_query = (
         select(Task)
         .where(Task.teacher_id == current_user.id)

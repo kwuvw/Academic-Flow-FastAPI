@@ -21,8 +21,6 @@ def require_admin(user: User):
         )
 
 
-# ─── Статистика ───────────────────────────────────────────────
-
 @router.get("/stats")
 async def get_stats(
     current_user: User = Depends(get_current_user),
@@ -59,8 +57,6 @@ async def get_stats(
         "total_tasks": tasks_q.scalar() or 0,
     }
 
-
-# ─── Пользователи ─────────────────────────────────────────────
 
 @router.get("/users")
 async def get_users(
@@ -123,8 +119,6 @@ async def delete_user(
     await session.commit()
     return {"detail": "Пользователь удалён"}
 
-
-# ─── Группы ───────────────────────────────────────────────────
 
 @router.get("/groups")
 async def get_groups(

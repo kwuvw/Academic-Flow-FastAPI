@@ -127,6 +127,7 @@ class ConnectionDAO:
             elif connection.status == ConnectionStatus.pending:
                 pending.append(item)
 
+        # Обработка «осиротевших» связей: преподаватель удалён, но связь осталась
         orphan_teacher_ids = [
             c.teacher_id for c in connections if c.teacher_id not in teacher_ids
         ]

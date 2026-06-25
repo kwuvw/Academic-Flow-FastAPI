@@ -1,13 +1,14 @@
 import json
 import os
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
+from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
-from src.auth.dependencies import get_current_teacher
+from src.auth.dependencies import get_current_teacher, get_current_user
 from src.auth.models import ConnectionStatus, User, UserConnection
 from src.database import get_async_session
 from src.tasks.models import Task
@@ -17,9 +18,146 @@ router = APIRouter(
     tags=["Задания"],
 )
 
+# Директория для файлов заданий, разрешённые расширения и лимит 10 МБ
 UPLOAD_DIR = os.path.join("src", "frontend", "static", "uploads", "tasks")
 ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".pdf", ".doc", ".docx"}
 MAX_FILE_SIZE = 10 * 1024 * 1024
+
+
+def _serialize_task(t: Task) -> dict:
+    """Сериализация задачи в JSON-словарь для API."""
+    file_path = None
+    file_original_name = None
+    if t.file_paths:
+        try:
+            paths = json.loads(t.file_paths)
+            if paths:
+                file_path = paths[0]
+        except (json.JSONDecodeError, TypeError):
+            pass
+    if t.file_original_name:
+        try:
+            names = json.loads(t.file_original_name)
+            if names:
+                file_original_name = names[0]
+        except (json.JSONDecodeError, TypeError):
+            pass
+
+    teacher_name = None
+    if t.teacher:
+        parts = [t.teacher.last_name, t.teacher.first_name, t.teacher.middle_name]
+        teacher_name = " ".join(p for p in parts if p)
+
+    now = datetime.now(timezone.utc)
+    # Определяем статус задачи по дедлайну:
+    # active — дедлайн ещё не наступил (deadline >= now)
+    # completed — дедлайн прошёл, но прошло не более 7 дней (now - 7д <= deadline < now)
+    task_status = "active"
+    if t.deadline:
+        if t.deadline < now:
+            # Дедлайн прошёл — задача завершена, если прошло не более 7 дней
+            if (now - t.deadline).days <= 7:
+                task_status = "completed"
+            else:
+                # Более 7 дней — к удалению (не должен попасть в выборку)
+                task_status = "expired"
+
+    return {
+        "id": t.id,
+        "title": t.title,
+        "description": t.description,
+        "deadline": t.deadline.isoformat() if t.deadline else None,
+        "created_at": t.created_at.isoformat(),
+        "group_name": t.group_name,
+        "course_number": t.course_number,
+        "file_path": file_path,
+        "file_original_name": file_original_name,
+        "teacher_name": teacher_name,
+        "status": task_status,
+    }
+
+
+@router.get("/list")
+async def list_tasks(
+    status_filter: str = Query("active", alias="status", pattern="^(active|completed)$"),
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_async_session),
+):
+    """
+    Получение списка заданий с фильтрацией по статусу.
+    - active: дедлайн ещё не наступил (deadline >= now)
+    - completed: дедлайн прошёл, но не более 7 дней назад
+    Для студентов — задания их группы/курса.
+    Для преподавателей — задания, которые они выдали.
+    """
+    now = datetime.now(timezone.utc)
+
+    if current_user.role == "student":
+        # Студент видит задания своей группы и курса
+        base_filter = and_(
+            Task.group_name == current_user.group_name,
+            Task.course_number == current_user.course_number,
+        )
+    else:
+        # Преподаватель видит задания, которые он создал
+        base_filter = Task.teacher_id == current_user.id
+
+    if status_filter == "active":
+        # Активные: дедлайн ещё не наступил
+        time_filter = Task.deadline >= now
+    else:
+        # Завершённые: дедлайн прошёл, но прошло не более 7 дней
+        seven_days_ago = now - timedelta(days=7)
+        time_filter = and_(Task.deadline < now, Task.deadline >= seven_days_ago)
+
+    task_query = (
+        select(Task)
+        .where(base_filter, time_filter)
+        .options(joinedload(Task.teacher))
+        .order_by(Task.created_at.desc())
+    )
+    result = await session.execute(task_query)
+    tasks_raw = list(result.scalars().all())
+
+    return [_serialize_task(t) for t in tasks_raw]
+
+
+@router.post("/cleanup", status_code=status.HTTP_200_OK)
+async def cleanup_expired_tasks(
+    session: AsyncSession = Depends(get_async_session),
+):
+    """
+    Удаление заданий, у которых deadline < (текущая_дата - 7 дней).
+    Можно вызывать вручную или через фоновую задачу.
+    """
+    now = datetime.now(timezone.utc)
+    cutoff = now - timedelta(days=7)
+
+    # Находим задания, просроченные более 7 дней
+    query = select(Task).where(Task.deadline < cutoff)
+    result = await session.execute(query)
+    expired_tasks = list(result.scalars().all())
+
+    if not expired_tasks:
+        return {"status": "success", "message": "Нет заданий для удаления", "deleted": 0}
+
+    deleted_count = 0
+    for task in expired_tasks:
+        # Удаляем файлы задания с диска
+        if task.file_paths:
+            try:
+                paths = json.loads(task.file_paths)
+                for p in paths:
+                    full_path = os.path.join("src", "frontend", p.lstrip("/"))
+                    if os.path.exists(full_path):
+                        os.remove(full_path)
+            except (json.JSONDecodeError, TypeError, OSError):
+                pass
+        await session.delete(task)
+        deleted_count += 1
+
+    await session.commit()
+    return {"status": "success", "message": f"Удалено заданий: {deleted_count}", "deleted": deleted_count}
 
 
 @router.get("/my-groups")
@@ -132,6 +270,7 @@ async def create_task(
                         detail=f"Недопустимый формат '{ext}'. Разрешены: {', '.join(sorted(ALLOWED_EXTENSIONS))}",
                     )
 
+                # UUID-имя файла для избежания коллизий и подмены
                 safe_name = f"{uuid.uuid4().hex}{ext}"
                 file_path = os.path.join(UPLOAD_DIR, safe_name)
 
@@ -219,6 +358,10 @@ async def complete_task(
     current_user: User = Depends(get_current_teacher),
     session: AsyncSession = Depends(get_async_session),
 ):
+    """
+    Принудительное завершение задания преподавателем (ручное удаление).
+    Задание удаляется немедленно, минуя 7-дневный срок хранения.
+    """
     query = select(Task).where(Task.id == task_id, Task.teacher_id == current_user.id)
     result = await session.execute(query)
     task = result.scalar_one_or_none()

@@ -15,8 +15,10 @@ class Base(DeclarativeBase):
     pass 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    # Асинхронный генератор: FastAPI внедряет сессию через Depends,
+    # а finally гарантирует закрытие даже при исключении
     async with async_session_maker() as session:
-        try: 
+        try:
             yield session
         finally:
             await session.close()
